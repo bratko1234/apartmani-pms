@@ -32,6 +32,9 @@ import {
   ExitToApp as SignoutIcon,
   Flag as CountriesIcon,
   CalendarMonth as SchedulerIcon,
+  AccountBalance as OwnerDashboardIcon,
+  EventNote as OwnerCalendarIcon,
+  AttachMoney as OwnerRevenueIcon,
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as movininTypes from ':movinin-types'
@@ -298,24 +301,59 @@ const Header = ({
                   <ListItemIcon><SchedulerIcon /></ListItemIcon>
                   <ListItemText primary={strings.SCHEDULER} />
                 </ListItem>
-                <ListItem
-                  onClick={() => {
-                    navigate('/agencies')
-                    handleSideMenuClose()
-                  }}
-                >
-                  <ListItemIcon><AgenciesIcon /></ListItemIcon>
-                  <ListItemText primary={strings.AGENCIES} />
-                </ListItem>
-                <ListItem
-                  onClick={() => {
-                    navigate('/countries')
-                    handleSideMenuClose()
-                  }}
-                >
-                  <ListItemIcon><CountriesIcon /></ListItemIcon>
-                  <ListItemText primary={strings.COUNTRIES} />
-                </ListItem>
+                {user?.type === movininTypes.UserType.Agency && (
+                  <>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/owner-dashboard')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><OwnerDashboardIcon /></ListItemIcon>
+                      <ListItemText primary={strings.OWNER_DASHBOARD} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/owner-calendar')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><OwnerCalendarIcon /></ListItemIcon>
+                      <ListItemText primary={strings.OWNER_CALENDAR} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/owner-revenue')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><OwnerRevenueIcon /></ListItemIcon>
+                      <ListItemText primary={strings.OWNER_REVENUE} />
+                    </ListItem>
+                  </>
+                )}
+                {user?.type === movininTypes.UserType.Admin && (
+                  <ListItem
+                    onClick={() => {
+                      navigate('/agencies')
+                      handleSideMenuClose()
+                    }}
+                  >
+                    <ListItemIcon><AgenciesIcon /></ListItemIcon>
+                    <ListItemText primary={strings.AGENCIES} />
+                  </ListItem>
+                )}
+                {user?.type === movininTypes.UserType.Admin && (
+                  <ListItem
+                    onClick={() => {
+                      navigate('/countries')
+                      handleSideMenuClose()
+                    }}
+                  >
+                    <ListItemIcon><CountriesIcon /></ListItemIcon>
+                    <ListItemText primary={strings.COUNTRIES} />
+                  </ListItem>
+                )}
                 <ListItem
                   onClick={() => {
                     navigate('/locations')
@@ -334,15 +372,17 @@ const Header = ({
                   <ListItemIcon><PropertiesIcon /></ListItemIcon>
                   <ListItemText primary={strings.PROPERTIES} />
                 </ListItem>
-                <ListItem
-                  onClick={() => {
-                    navigate('/users')
-                    handleSideMenuClose()
-                  }}
-                >
-                  <ListItemIcon><UsersIcon /></ListItemIcon>
-                  <ListItemText primary={strings.USERS} />
-                </ListItem>
+                {user?.type === movininTypes.UserType.Admin && (
+                  <ListItem
+                    onClick={() => {
+                      navigate('/users')
+                      handleSideMenuClose()
+                    }}
+                  >
+                    <ListItemIcon><UsersIcon /></ListItemIcon>
+                    <ListItemText primary={strings.USERS} />
+                  </ListItem>
+                )}
                 <ListItem
                   onClick={() => {
                     navigate('about/')

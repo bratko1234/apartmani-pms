@@ -42,6 +42,9 @@ const Countries = lazy(() => import('@/pages/Countries'))
 const CreateCountry = lazy(() => import('@/pages/CreateCountry'))
 const UpdateCountry = lazy(() => import('@/pages/UpdateCountry'))
 const Scheduler = lazy(() => import('@/pages/Scheduler'))
+const OwnerDashboard = lazy(() => import('@/pages/OwnerDashboard'))
+const OwnerCalendar = lazy(() => import('@/pages/OwnerCalendar'))
+const OwnerRevenue = lazy(() => import('@/pages/OwnerRevenue'))
 
 const AppLayout = () => {
   const location = useLocation()
@@ -107,6 +110,9 @@ const router = createBrowserRouter([
       { path: '/create-country', element: <CreateCountry /> },
       { path: '/update-country', element: <UpdateCountry /> },
       { path: '/scheduler', element: <Scheduler /> },
+      { path: '/owner-dashboard', element: <OwnerDashboard /> },
+      { path: '/owner-calendar', element: <OwnerCalendar /> },
+      { path: '/owner-revenue', element: <OwnerRevenue /> },
       { path: '*', element: <NoMatch /> }
     ]
   }

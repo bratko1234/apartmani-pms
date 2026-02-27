@@ -11,6 +11,9 @@ const strings = new LocalizedStrings({
   es: {
     UNAUTHORIZED: 'Acceso no autorizado',
   },
+  sr: {
+    UNAUTHORIZED: 'Neovlašten pristup',
+  },
 })
 
 langHelper.setLanguage(strings)

@@ -7,6 +7,11 @@ import Const from './const'
 //
 const LANGUAGES = [
   {
+    code: 'sr',
+    countryCode: 'ba',
+    label: 'Srpski',
+  },
+  {
     code: 'en',
     countryCode: 'us',
     label: 'English',

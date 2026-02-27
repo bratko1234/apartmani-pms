@@ -18,6 +18,14 @@ const strings = new LocalizedStrings({
     COUNTRY: 'Country',
     PARENT_LOCATION: 'Parent Location',
   },
+  sr: {
+    NEW_LOCATION_HEADING: 'Nova lokacija',
+    LOCATION_NAME: 'Lokacija',
+    INVALID_LOCATION: 'Ova lokacija već postoji.',
+    LOCATION_CREATED: 'Lokacija je uspješno kreirana.',
+    COUNTRY: 'Država',
+    PARENT_LOCATION: 'Nadređena lokacija',
+  },
 })
 
 langHelper.setLanguage(strings)

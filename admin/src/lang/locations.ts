@@ -18,6 +18,14 @@ const strings = new LocalizedStrings({
     LOCATION: 'location',
     LOCATIONS: 'locations',
   },
+  sr: {
+    NEW_LOCATION: 'Nova lokacija',
+    DELETE_LOCATION: 'Da li ste sigurni da želite obrisati ovu lokaciju?',
+    CANNOT_DELETE_LOCATION: 'Ova lokacija ne može biti obrisana jer je povezana sa lokacijama ili nekretninama.',
+    EMPTY_LIST: 'Nema lokacija.',
+    LOCATION: 'lokacija',
+    LOCATIONS: 'lokacije',
+  },
 })
 
 langHelper.setLanguage(strings)

@@ -1,0 +1,27 @@
+.owner-revenue {
+  max-width: 1000px;
+  margin: 50px auto 0;
+  padding: 20px;
+}
+
+.owner-revenue-title {
+  margin-bottom: 24px !important;
+}
+
+.owner-revenue-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.owner-revenue-total-row {
+  background: #f5f5f5;
+}
+
+.owner-revenue-empty {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}

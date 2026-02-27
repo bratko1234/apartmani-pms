@@ -9,7 +9,11 @@ const strings = new LocalizedStrings({
     en: {
         SOLD_OUT: 'Sold out',
         SOLD_OUT_INFO: 'This property is sold out.',
-    }
+    },
+    sr: {
+        SOLD_OUT: 'Rasprodato',
+        SOLD_OUT_INFO: 'Ova nekretnina je rasprodana.',
+    },
 })
 
 langHelper.setLanguage(strings)

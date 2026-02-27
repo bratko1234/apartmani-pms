@@ -23,6 +23,13 @@ const strings = new LocalizedStrings({
     SEND: 'Στείλετε',
     MESSAGE_SENT: 'Το μήνυμα στάλθηκε'
   },
+  sr: {
+    CONTACT_HEADING: 'Kontakt',
+    SUBJECT: 'Predmet',
+    MESSAGE: 'Poruka',
+    SEND: 'Pošalji',
+    MESSAGE_SENT: 'Poruka je poslana',
+  },
 })
 
 langHelper.setLanguage(strings)

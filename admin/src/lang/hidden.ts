@@ -9,7 +9,11 @@ const strings = new LocalizedStrings({
     en: {
         HIDDEN: 'Hidden',
         HIDDEN_INFO: 'This property is hidden.',
-    }
+    },
+    sr: {
+        HIDDEN: 'Skriveno',
+        HIDDEN_INFO: 'Ova nekretnina je skrivena.',
+    },
 })
 
 langHelper.setLanguage(strings)

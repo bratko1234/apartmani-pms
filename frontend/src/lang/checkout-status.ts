@@ -19,6 +19,14 @@ const strings = new LocalizedStrings({
     STATUS_TITLE: `${env.WEBSITE_NAME} Booking Confirmation`,
     STATUS_MESSAGE: 'Check your mailbox and follow the steps described in the booking confirmation email to book your property. You will find property address and Google Maps link in the confirmation email.',
   },
+  sr: {
+    CONGRATULATIONS: 'Čestitamo!',
+    SUCCESS: 'Vaše plaćanje je uspješno izvršeno. Poslali smo vam email potvrde.',
+    SUCCESS_PAY_LATER: 'Vaša rezervacija je uspješno izvršena. Poslali smo vam email potvrde.',
+    ERROR: 'Nešto je pošlo po zlu! Pokušajte ponovo kasnije',
+    STATUS_TITLE: `${env.WEBSITE_NAME} Potvrda rezervacije`,
+    STATUS_MESSAGE: 'Provjerite vaš email i pratite korake opisane u emailu potvrde rezervacije kako biste rezervisali vašu nekretninu. Adresu nekretnine i Google Maps link ćete pronaći u emailu potvrde.',
+  },
 })
 
 langHelper.setLanguage(strings)

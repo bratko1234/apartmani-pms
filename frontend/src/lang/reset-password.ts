@@ -16,6 +16,13 @@ const strings = new LocalizedStrings({
     RESET: 'Reset',
     EMAIL_SENT: 'Password reset email sent.',
   },
+  sr: {
+    RESET_PASSWORD_HEADING: 'Resetovanje lozinke',
+    RESET_PASSWORD: 'Molimo unesite vašu email adresu kako bismo vam poslali email za resetovanje lozinke.',
+    EMAIL_ERROR: 'Email adresa nije registrovana',
+    RESET: 'Resetuj',
+    EMAIL_SENT: 'Email za resetovanje lozinke je poslan.',
+  },
 })
 
 langHelper.setLanguage(strings)

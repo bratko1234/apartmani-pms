@@ -28,6 +28,19 @@ const strings = new LocalizedStrings({
     CANCEL_BOOKING: 'Are you sure you want to cancel this booking?',
     CANCEL_BOOKING_REQUEST_SENT: 'Your cancel request has been submited. We will contact you to finalize the cancellation procedure.',
   },
+  sr: {
+    PROPERTY: 'Nekretnina',
+    AGENCY: 'Agencija',
+    PRICE: 'Cijena',
+    STATUS: 'Status',
+    EMPTY_LIST: 'Nema rezervacija.',
+    VIEW: 'Pogledaj ovu rezervaciju',
+    DAYS: 'Dana',
+    COST: 'Ukupno',
+    CANCEL: 'Otkaži ovu rezervaciju',
+    CANCEL_BOOKING: 'Da li ste sigurni da želite otkazati ovu rezervaciju?',
+    CANCEL_BOOKING_REQUEST_SENT: 'Vaš zahtjev za otkazivanje je poslan. Kontaktiraćemo vas kako bismo finalizovali proceduru otkazivanja.',
+  },
 })
 
 langHelper.setLanguage(strings)

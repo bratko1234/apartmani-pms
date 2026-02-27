@@ -8,6 +8,9 @@ const strings = new LocalizedStrings({
   en: {
     UPDATE_USER_HEADING: 'User update',
   },
+  sr: {
+    UPDATE_USER_HEADING: 'Izmjena korisnika',
+  },
 })
 
 langHelper.setLanguage(strings)

@@ -18,6 +18,8 @@ import * as mailHelper from '../utils/mailHelper'
 import * as helper from '../utils/helper'
 import * as logger from '../utils/logger'
 import stripeAPI from '../payment/stripe'
+import * as channexService from '../channex/channex.service'
+import * as channexMapper from '../channex/channex.mapper'
 
 /**
  * Create a Booking.
@@ -260,6 +262,7 @@ export const checkout = async (req: Request, res: Response) => {
     const { language } = user
     i18n.locale = language
 
+    body.booking.source = movininTypes.BookingSource.Direct
     const booking = new Booking(body.booking)
 
     await booking.save()
@@ -293,6 +296,40 @@ export const checkout = async (req: Request, res: Response) => {
         i18n.locale = admin.language
         message = body.payLater ? i18n.t('BOOKING_PAY_LATER_NOTIFICATION') : i18n.t('BOOKING_PAID_NOTIFICATION')
         await notify(user, booking._id.toString(), admin, message)
+      }
+
+      // Push direct booking to Channex to block OTA calendars
+      if (channexService.isEnabled()) {
+        try {
+          const property = await Property.findById(booking.property)
+          if (property) {
+            const mapping = await channexService.getMapping(
+              property._id.toString(),
+              movininTypes.ChannexMappingType.Property,
+            )
+            if (mapping) {
+              const channexBookingId = await channexService.createBooking({
+                property_id: mapping.channexId,
+                arrival_date: booking.from.toISOString().split('T')[0],
+                departure_date: booking.to.toISOString().split('T')[0],
+                guest: {
+                  first_name: user.fullName.split(' ')[0] || user.fullName,
+                  last_name: user.fullName.split(' ').slice(1).join(' ') || '',
+                  email: user.email,
+                },
+                currency: 'EUR',
+                total_price: booking.price,
+                source: 'apartmani.ba',
+              })
+              if (channexBookingId) {
+                booking.channexBookingId = channexBookingId
+                await booking.save()
+              }
+            }
+          }
+        } catch (channexErr) {
+          logger.error('[booking.checkout] Failed to push to Channex', channexErr)
+        }
       }
     }
 

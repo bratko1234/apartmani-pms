@@ -73,6 +73,27 @@ const bookingSchema = new Schema<env.Booking>(
     paypalOrderId: {
       type: String,
     },
+    source: {
+      type: String,
+      enum: [
+        movininTypes.BookingSource.Direct,
+        movininTypes.BookingSource.Airbnb,
+        movininTypes.BookingSource.BookingCom,
+        movininTypes.BookingSource.Expedia,
+        movininTypes.BookingSource.Other,
+      ],
+      default: movininTypes.BookingSource.Direct,
+    },
+    channexBookingId: {
+      type: String,
+      index: true,
+    },
+    channexReservationId: {
+      type: String,
+    },
+    externalGuestName: {
+      type: String,
+    },
     expireAt: {
       //
       // Bookings created from checkout with Stripe are temporary and

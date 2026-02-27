@@ -34,6 +34,22 @@ const strings = new LocalizedStrings({
     DAYS: 'Days',
     COST: 'COST',
   },
+  sr: {
+    PROPERTY: 'Nekretnina',
+    AGENCY: 'Agencija',
+    RENTER: 'Stanar',
+    PRICE: 'Cijena',
+    STATUS: 'Status',
+    UPDATE_SELECTION: 'Uredi odabrano',
+    DELETE_SELECTION: 'Obriši odabrano',
+    UPDATE_STATUS: 'Izmjena statusa',
+    NEW_STATUS: 'Novi status',
+    DELETE_BOOKING: 'Da li ste sigurni da želite obrisati ovu rezervaciju?',
+    DELETE_BOOKINGS: 'Da li ste sigurni da želite obrisati odabrane rezervacije?',
+    EMPTY_LIST: 'Nema rezervacija.',
+    DAYS: 'Dana',
+    COST: 'Ukupno',
+  },
 })
 
 langHelper.setLanguage(strings)

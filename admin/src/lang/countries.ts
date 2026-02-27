@@ -18,6 +18,14 @@ const strings = new LocalizedStrings({
     COUNTRY: 'country',
     COUNTRIES: 'countries',
   },
+  sr: {
+    NEW_COUNTRY: 'Nova država',
+    DELETE_COUNTRY: 'Da li ste sigurni da želite obrisati ovu državu?',
+    CANNOT_DELETE_COUNTRY: 'Ova država ne može biti obrisana jer je povezana sa lokacijama.',
+    EMPTY_LIST: 'Nema država.',
+    COUNTRY: 'država',
+    COUNTRIES: 'države',
+  },
 })
 
 langHelper.setLanguage(strings)

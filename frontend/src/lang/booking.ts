@@ -8,6 +8,9 @@ const strings = new LocalizedStrings({
   en: {
     TOTAL: 'Total:',
   },
+  sr: {
+    TOTAL: 'Ukupno:',
+  },
 })
 
 langHelper.setLanguage(strings)

@@ -21,6 +21,15 @@ const strings = new LocalizedStrings({
     CONTENT2: "Enjoy unmatched convenience, reliability, and value with our premier property rental service. From effortless bookings to high-quality properties, we're your trusted travel partner.",
     FIND_DEAL: 'Find Deal',
   },
+  sr: {
+    TITLE1: `${env.WEBSITE_NAME} - Vaš premijum servis za iznajmljivanje nekretnina`,
+    SUBTITLE1: 'Vaš pouzdani partner za iznajmljivanje nekretnina',
+    CONTENT1: `U ${env.WEBSITE_NAME}, razumijemo da je svako putovanje jedinstveno. Posvećeni smo pružanju našim klijentima raznovrsnog izbora nekretnina koje zadovoljavaju svaku potrebu putovanja. Bilo da istražujete grad, putujete poslovno ili tražite avanturu, naše pouzdane usluge iznajmljivanja nekretnina osiguravaju da vaša avantura počne bez problema. Naša misija je pružiti izuzetnu korisničku uslugu, čineći vaše iskustvo ugodnim i bez stresa. Sa konkurentnim cijenama, raznovrsnim dobro održavanim nekretninama i posvećenim timom spremnim da vam pomogne, nastojimo biti vaš pouzdani partner na putu. Izaberite ${env.WEBSITE_NAME} za sve vaše potrebe iznajmljivanja nekretnina i iskusite slobodu istraživanja vlastitim tempom.`,
+    TITLE2: `Zašto izabrati ${env.WEBSITE_NAME}`,
+    SUBTITLE2: 'Iskusite izvrsnost na svakom putovanju',
+    CONTENT2: 'Uživajte u nenadmašnoj udobnosti, pouzdanosti i vrijednosti uz naš premijum servis za iznajmljivanje nekretnina. Od jednostavnih rezervacija do visokokvalitetnih nekretnina, mi smo vaš pouzdani partner za putovanja.',
+    FIND_DEAL: 'Pronađi ponudu',
+  },
 })
 
 langHelper.setLanguage(strings)

@@ -54,6 +54,14 @@ export enum PaymentGateway {
   Stripe = 'stripe',
 }
 
+export enum BookingSource {
+  Direct = 'DIRECT',
+  Airbnb = 'AIRBNB',
+  BookingCom = 'BOOKING_COM',
+  Expedia = 'EXPEDIA',
+  Other = 'OTHER',
+}
+
 export interface SignUpPayload {
   email: string
   password: string
@@ -141,6 +149,10 @@ export interface Booking {
   customerId?: string
   expireAt?: Date
   paypalOrderId?: string
+  source?: BookingSource
+  channexBookingId?: string
+  channexReservationId?: string
+  externalGuestName?: string
 }
 
 export interface CheckoutPayload {
@@ -491,3 +503,58 @@ export interface PropertyFilter {
 }
 
 export type PropertyFilterSubmitEvent = (filter: PropertyFilter) => void
+
+//
+// Channex types
+//
+export enum ChannexMappingType {
+  Property = 'PROPERTY',
+  RoomType = 'ROOM_TYPE',
+  RatePlan = 'RATE_PLAN',
+}
+
+export interface ChannexMapping {
+  _id?: string
+  internalId: string
+  internalType: ChannexMappingType
+  channexId: string
+  channexType: string
+  metadata?: Record<string, unknown>
+  lastSyncedAt?: Date
+}
+
+//
+// Owner portal types
+//
+export interface OwnerRevenueBySource {
+  source: BookingSource
+  bookings: number
+  nights: number
+  revenue: number
+}
+
+export interface OwnerDashboardData {
+  totalBookings: number
+  upcomingBookings: number
+  occupancyRate: number
+  totalRevenue: number
+  revenueBySource: OwnerRevenueBySource[]
+  upcomingBookingsList: Booking[]
+}
+
+export interface OwnerCalendarDay {
+  date: string
+  bookingId?: string
+  guestName?: string
+  source?: BookingSource
+  status?: BookingStatus
+}
+
+export interface OwnerRevenueRow {
+  propertyId: string
+  propertyName: string
+  source: BookingSource
+  bookings: number
+  nights: number
+  grossRevenue: number
+}

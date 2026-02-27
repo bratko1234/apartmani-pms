@@ -105,6 +105,52 @@ If you have any questions regarding these Terms of Service, please contact us at
 By using our services, you acknowledge that you have read and understood these Terms of Service and agree to be bound by them.
     `,
   },
+  sr: {
+    TITLE: 'Uslovi korištenja',
+    TOS: `
+Dobrodošli u ${env.WEBSITE_NAME}! Pristupanjem našoj web stranici i korištenjem naših usluga, slažete se da ćete poštovati i biti obavezani sljedećim uslovima korištenja. Ako se ne slažete sa ovim uslovima, molimo vas da ne koristite naše usluge.
+
+1. Prihvatanje uslova
+
+Pristupanjem ili korištenjem naših usluga potvrđujete da ste pročitali, razumjeli i prihvatili ove uslove korištenja i našu politiku privatnosti.
+
+2. Korištenje naših usluga
+
+Slažete se da ćete koristiti naše usluge samo u zakonite svrhe i na način koji ne krši prava, ne ograničava niti sprečava bilo koga drugog u korištenju naših usluga. To uključuje poštovanje svih primjenjivih zakona i propisa.
+
+3. Rezervacije i plaćanja
+
+Kada izvršite rezervaciju putem ${env.WEBSITE_NAME}, slažete se da ćete pružiti tačne i potpune informacije. Sva plaćanja moraju biti izvršena putem našeg sigurnog sistema plaćanja. Nakon što je plaćanje završeno, dobićete potvrdu vaše rezervacije.
+
+4. Politika otkazivanja
+
+Otkazivanja izvršena 24 sata prije datuma iznajmljivanja mogu ostvariti pravo na puni povrat sredstava. Otkazivanja izvršena manje od 24 sata prije datuma iznajmljivanja mogu rezultirati naknadom za otkazivanje. Molimo pogledajte našu politiku otkazivanja za detaljne informacije.
+
+5. Uslovi iznajmljivanja
+
+Sva iznajmljivanja su podložna našim uslovima iznajmljivanja, koji uključuju, ali nisu ograničeni na starosna ograničenja i obaveze osiguranja. Vi ste odgovorni da osigurate da ispunjavate sve uslove prije rezervacije.
+
+6. Ograničenje odgovornosti
+
+${env.WEBSITE_NAME} neće biti odgovoran za bilo kakvu indirektnu, slučajnu ili posljedičnu štetu koja proizlazi iz vašeg korištenja naših usluga. Ni u kom slučaju naša ukupna odgovornost neće premašiti iznos koji ste platili za usluge.
+
+7. Izmjene uslova
+
+Zadržavamo pravo da izmijenimo ove uslove korištenja u bilo kojem trenutku. Sve promjene stupaju na snagu odmah nakon objavljivanja na našoj web stranici. Vaše dalje korištenje naših usluga nakon bilo kakvih promjena predstavlja vaše prihvatanje novih uslova.
+
+8. Primjenjivo pravo
+
+Ovi uslovi korištenja će se tumačiti i regulisati u skladu sa zakonima. Svi sporovi koji proizlaze iz ovih uslova biće riješeni pred nadležnim sudovima.
+
+9. Kontakt informacije
+
+Ako imate bilo kakvih pitanja u vezi sa ovim uslovima korištenja, molimo kontaktirajte nas na ${env.CONTACT_EMAIL}. Tu smo da vam pomognemo sa svim upitima vezanim za naše usluge.
+
+10. Potvrda
+
+Korištenjem naših usluga potvrđujete da ste pročitali i razumjeli ove uslove korištenja i da pristajete da budete njima obavezani.
+    `,
+  },
 })
 
 langHelper.setLanguage(strings)

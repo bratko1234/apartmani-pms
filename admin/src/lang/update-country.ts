@@ -10,6 +10,10 @@ const strings = new LocalizedStrings({
     UPDATE_COUNTRY: 'Country update',
     COUNTRY_UPDATED: 'Country updated successfully.',
   },
+  sr: {
+    UPDATE_COUNTRY: 'Izmjena države',
+    COUNTRY_UPDATED: 'Država je uspješno ažurirana.',
+  },
 })
 
 langHelper.setLanguage(strings)

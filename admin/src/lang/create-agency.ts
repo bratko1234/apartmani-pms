@@ -15,6 +15,12 @@ const strings = new LocalizedStrings({
     AGENCY_IMAGE_SIZE_ERROR: `The image must be in the format ${env.AGENCY_IMAGE_WIDTH}x${env.AGENCY_IMAGE_HEIGHT}`,
     RECOMMENDED_IMAGE_SIZE: `Recommended image size: ${env.AGENCY_IMAGE_WIDTH}x${env.AGENCY_IMAGE_HEIGHT}`,
   },
+  sr: {
+    CREATE_AGENCY_HEADING: 'Nova agencija',
+    INVALID_AGENCY_NAME: 'Ova agencija već postoji.',
+    AGENCY_IMAGE_SIZE_ERROR: `Slika mora biti u formatu ${env.AGENCY_IMAGE_WIDTH}x${env.AGENCY_IMAGE_HEIGHT}`,
+    RECOMMENDED_IMAGE_SIZE: `Preporučena veličina slike: ${env.AGENCY_IMAGE_WIDTH}x${env.AGENCY_IMAGE_HEIGHT}`,
+  },
 })
 
 langHelper.setLanguage(strings)

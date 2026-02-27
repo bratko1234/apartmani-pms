@@ -32,6 +32,21 @@
       PRIVACY_POLICY: 'Privacy Policy',
       COOKIE_POLICY: 'Cookie Policy',
     },
+    sr: {
+      SIGN_IN: 'Prijava',
+      HOME: 'Početna',
+      BOOKINGS: 'Rezervacije',
+      ABOUT: 'O nama',
+      TOS: 'Uslovi korištenja',
+      CONTACT: 'Kontakt',
+      LANGUAGE: 'Jezik',
+      SETTINGS: 'Podešavanja',
+      SIGN_OUT: 'Odjava',
+      AGENCIES: 'Agencije',
+      LOCATIONS: 'Destinacije',
+      PRIVACY_POLICY: 'Politika privatnosti',
+      COOKIE_POLICY: 'Politika kolačića',
+    },
   })
 
   langHelper.setLanguage(strings)

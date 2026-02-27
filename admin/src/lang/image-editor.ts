@@ -13,7 +13,13 @@ const strings = new LocalizedStrings({
         ADD_IMAGES: 'Add additional images',
         UPDATE_IMAGE: 'Update main image',
         DELETE_IMAGE: 'Are you sure you want to delete this image?',
-    }
+    },
+    sr: {
+        ADD_IMAGE: 'Dodaj glavnu sliku',
+        ADD_IMAGES: 'Dodaj dodatne slike',
+        UPDATE_IMAGE: 'Izmijeni glavnu sliku',
+        DELETE_IMAGE: 'Da li ste sigurni da želite obrisati ovu sliku?',
+    },
 })
 
 langHelper.setLanguage(strings)

@@ -32,6 +32,7 @@ export const __env__ = (name: string, required?: boolean, defaultValue?: string)
 export const LANGUAGES = [
   'en',
   'fr',
+  'sr',
 ]
 
 /**
@@ -477,6 +478,41 @@ export const FACEBOOK_APP_ID = __env__('MI_FACEBOOK_APP_ID', false, 'FACEBOOK_AP
 export const FACEBOOK_APP_SECRET = __env__('MI_FACEBOOK_APP_SECRET', false, 'FACEBOOK_APP_SECRET')
 
 /**
+ * Channex.io API key.
+ *
+ * @type {string}
+ */
+export const CHANNEX_API_KEY = __env__('MI_CHANNEX_API_KEY', false)
+
+/**
+ * Channex.io base URL. Default is staging.
+ *
+ * @type {string}
+ */
+export const CHANNEX_BASE_URL = __env__('MI_CHANNEX_BASE_URL', false, 'https://staging.channex.io/api/v1')
+
+/**
+ * Channex.io webhook secret for signature verification.
+ *
+ * @type {string}
+ */
+export const CHANNEX_WEBHOOK_SECRET = __env__('MI_CHANNEX_WEBHOOK_SECRET', false)
+
+/**
+ * Channex.io property group ID.
+ *
+ * @type {string}
+ */
+export const CHANNEX_PROPERTY_GROUP_ID = __env__('MI_CHANNEX_PROPERTY_GROUP_ID', false)
+
+/**
+ * Whether Channex integration is enabled.
+ *
+ * @type {boolean}
+ */
+export const CHANNEX_ENABLED = helper.StringToBoolean(__env__('MI_CHANNEX_ENABLED', false, 'false'))
+
+/**
  * User Document.
  *
  * @export
@@ -558,6 +594,10 @@ export interface Booking extends Document {
   customerId?: string
   expireAt?: Date
   paypalOrderId?: string
+  source?: movininTypes.BookingSource
+  channexBookingId?: string
+  channexReservationId?: string
+  externalGuestName?: string
 }
 
 /**

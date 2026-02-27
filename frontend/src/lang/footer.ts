@@ -37,6 +37,22 @@ const strings = new LocalizedStrings({
     PRIVACY_POLICY: 'Privacy Policy',
     COOKIE_POLICY: 'Cookie Policy',
   },
+  sr: {
+    COPYRIGHT_PART1,
+    COPYRIGHT_PART2: '. Sva prava zadržana.',
+
+    CORPORATE: 'O nama',
+    ABOUT: 'O nama',
+    TOS: 'Uslovi korištenja',
+    RENT: 'Iznajmi nekretninu',
+    AGENCIES: 'Agencije',
+    LOCATIONS: 'Destinacije',
+    SUPPORT: 'Podrška',
+    CONTACT: 'Kontakt',
+    SECURE_PAYMENT: `100% sigurno plaćanje sa ${env.WEBSITE_NAME}`,
+    PRIVACY_POLICY: 'Politika privatnosti',
+    COOKIE_POLICY: 'Politika kolačića',
+  },
 })
 
 langHelper.setLanguage(strings)
