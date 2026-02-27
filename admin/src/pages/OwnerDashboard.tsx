@@ -12,10 +12,10 @@ import {
   Paper,
 } from '@mui/material'
 import * as movininTypes from ':movinin-types'
-import * as movininHelper from ':movinin-helper'
 import Layout from '@/components/Layout'
 import { strings } from '@/lang/owner-dashboard'
 import * as OwnerService from '@/services/OwnerService'
+import * as helper from '@/utils/helper'
 
 import '@/assets/css/owner-dashboard.css'
 
@@ -38,7 +38,7 @@ const OwnerDashboard = () => {
         const data = await OwnerService.getDashboard()
         setDashboard(data)
       } catch (err) {
-        movininHelper.error(err)
+        helper.error(err)
       } finally {
         setLoading(false)
       }

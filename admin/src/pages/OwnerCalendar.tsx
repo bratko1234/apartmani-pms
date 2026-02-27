@@ -13,11 +13,11 @@ import {
   ChevronRight as NextIcon,
 } from '@mui/icons-material'
 import * as movininTypes from ':movinin-types'
-import * as movininHelper from ':movinin-helper'
 import Layout from '@/components/Layout'
 import { strings } from '@/lang/owner-calendar'
 import * as OwnerService from '@/services/OwnerService'
 import * as PropertyService from '@/services/PropertyService'
+import * as helper from '@/utils/helper'
 
 import '@/assets/css/owner-calendar.css'
 
@@ -45,15 +45,18 @@ const OwnerCalendar = () => {
         const payload: movininTypes.GetPropertiesPayload = {
           agencies: [user._id as string],
         }
-        const data = await PropertyService.getProperties(payload, 1, 100)
-        if (data?.resultData) {
-          setProperties(data.resultData)
-          if (data.resultData.length > 0) {
-            setSelectedProperty(data.resultData[0]._id)
+        const result = await PropertyService.getProperties('', payload, 1, 100)
+        if (result && result.length > 0) {
+          const data = result[0]
+          if (data && data.resultData) {
+            setProperties(data.resultData)
+            if (data.resultData.length > 0) {
+              setSelectedProperty(data.resultData[0]._id)
+            }
           }
         }
       } catch (err) {
-        movininHelper.error(err)
+        helper.error(err)
       }
     }
 
@@ -70,7 +73,7 @@ const OwnerCalendar = () => {
         const days = await OwnerService.getCalendar(selectedProperty, year, month)
         setCalendarDays(days)
       } catch (err) {
-        movininHelper.error(err)
+        helper.error(err)
       }
     }
 

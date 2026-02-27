@@ -15,10 +15,10 @@ import {
   ChevronRight as NextIcon,
 } from '@mui/icons-material'
 import * as movininTypes from ':movinin-types'
-import * as movininHelper from ':movinin-helper'
 import Layout from '@/components/Layout'
 import { strings } from '@/lang/owner-revenue'
 import * as OwnerService from '@/services/OwnerService'
+import * as helper from '@/utils/helper'
 
 import '@/assets/css/owner-revenue.css'
 
@@ -44,7 +44,7 @@ const OwnerRevenue = () => {
         const data = await OwnerService.getRevenue(year, month)
         setRows(data)
       } catch (err) {
-        movininHelper.error(err)
+        helper.error(err)
       } finally {
         setLoading(false)
       }
