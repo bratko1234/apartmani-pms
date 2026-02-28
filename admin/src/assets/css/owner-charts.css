@@ -1,0 +1,118 @@
+.owner-dashboard-trends {
+  margin-bottom: 32px;
+}
+
+.owner-dashboard-trends-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.owner-dashboard-period-selector {
+  display: flex;
+  gap: 8px;
+}
+
+.owner-dashboard-period-btn {
+  padding: 6px 16px;
+  border: 1px solid #1976d2;
+  border-radius: 4px;
+  background: transparent;
+  color: #1976d2;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+.owner-dashboard-period-btn:hover {
+  background: rgba(25, 118, 210, 0.08);
+}
+
+.owner-dashboard-period-btn.active {
+  background: #1976d2;
+  color: #fff;
+}
+
+.owner-dashboard-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.owner-dashboard-chart-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+}
+
+.owner-dashboard-chart-card h6 {
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.owner-chart-tooltip {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.owner-chart-tooltip-label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #333;
+  font-size: 13px;
+}
+
+.owner-chart-tooltip-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1976d2;
+}
+
+.owner-chart-tooltip-item {
+  font-size: 13px;
+  margin: 2px 0;
+}
+
+.owner-chart-tooltip-total {
+  font-weight: 600;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #e0e0e0;
+  color: #333;
+  font-size: 13px;
+}
+
+.owner-dashboard-chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #999;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .owner-dashboard-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .owner-dashboard-trends-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .owner-dashboard-period-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+}

@@ -736,3 +736,18 @@ export interface CalculateStayPricePayload {
   channel?: RateChannel
   isMember?: boolean
 }
+
+export interface OccupancyTrendPoint {
+  month: string
+  occupancyRate: number
+}
+
+export interface RevenueTrendPoint {
+  month: string
+  direct: number
+  airbnb: number
+  bookingCom: number
+  expedia: number
+  other: number
+  total: number
+}

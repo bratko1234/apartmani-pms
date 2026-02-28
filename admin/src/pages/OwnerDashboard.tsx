@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import {
   Card,
   CardContent,
@@ -18,11 +18,31 @@ import * as OwnerService from '@/services/OwnerService'
 import * as helper from '@/utils/helper'
 
 import '@/assets/css/owner-dashboard.css'
+import '@/assets/css/owner-charts.css'
+
+const OccupancyChart = lazy(() => import('@/components/OccupancyChart'))
+const RevenueChart = lazy(() => import('@/components/RevenueChart'))
+
+type TrendPeriod = '6m' | '12m' | 'ytd'
+
+const getMonthsForPeriod = (period: TrendPeriod): number => {
+  if (period === '6m') {
+    return 6
+  }
+  if (period === 'ytd') {
+    return new Date().getMonth() + 1
+  }
+  return 12
+}
 
 const OwnerDashboard = () => {
   const [user, setUser] = useState<movininTypes.User>()
   const [dashboard, setDashboard] = useState<movininTypes.OwnerDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [trendPeriod, setTrendPeriod] = useState<TrendPeriod>('12m')
+  const [occupancyTrend, setOccupancyTrend] = useState<movininTypes.OccupancyTrendPoint[]>([])
+  const [revenueTrend, setRevenueTrend] = useState<movininTypes.RevenueTrendPoint[]>([])
+  const [trendsLoading, setTrendsLoading] = useState(false)
 
   const onLoad = (_user?: movininTypes.User) => {
     setUser(_user)
@@ -47,6 +67,31 @@ const OwnerDashboard = () => {
     fetchDashboard()
   }, [user])
 
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+
+    const fetchTrends = async () => {
+      setTrendsLoading(true)
+      try {
+        const months = getMonthsForPeriod(trendPeriod)
+        const [occupancyData, revenueData] = await Promise.all([
+          OwnerService.getOccupancyTrend(months),
+          OwnerService.getRevenueTrend(months),
+        ])
+        setOccupancyTrend(occupancyData)
+        setRevenueTrend(revenueData)
+      } catch (err) {
+        helper.error(err)
+      } finally {
+        setTrendsLoading(false)
+      }
+    }
+
+    fetchTrends()
+  }, [user, trendPeriod])
+
   const formatSource = (source: movininTypes.BookingSource): string => {
     const sourceLabels: Record<string, string> = {
       [movininTypes.BookingSource.Direct]: 'Direct',
@@ -57,6 +102,12 @@ const OwnerDashboard = () => {
     }
     return sourceLabels[source] || source
   }
+
+  const periodButtons: Array<{ key: TrendPeriod; label: string }> = [
+    { key: '6m', label: strings.PERIOD_6M },
+    { key: '12m', label: strings.PERIOD_12M },
+    { key: 'ytd', label: strings.PERIOD_YTD },
+  ]
 
   return (
     <Layout strict onLoad={onLoad}>
@@ -94,6 +145,48 @@ const OwnerDashboard = () => {
                 <Typography variant="h3">&euro;{dashboard.totalRevenue.toLocaleString()}</Typography>
               </CardContent>
             </Card>
+          </div>
+
+          <div className="owner-dashboard-trends">
+            <div className="owner-dashboard-trends-header">
+              <Typography variant="h5">{strings.TRENDS}</Typography>
+              <div className="owner-dashboard-period-selector">
+                {periodButtons.map((btn) => (
+                  <button
+                    key={btn.key}
+                    type="button"
+                    className={`owner-dashboard-period-btn${trendPeriod === btn.key ? ' active' : ''}`}
+                    onClick={() => setTrendPeriod(btn.key)}
+                  >
+                    {btn.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="owner-dashboard-charts-grid">
+              <div className="owner-dashboard-chart-card">
+                <Typography variant="h6">{strings.OCCUPANCY_TREND}</Typography>
+                {trendsLoading ? (
+                  <div className="owner-dashboard-chart-loading">Loading...</div>
+                ) : (
+                  <Suspense fallback={<div className="owner-dashboard-chart-loading">Loading...</div>}>
+                    <OccupancyChart data={occupancyTrend} />
+                  </Suspense>
+                )}
+              </div>
+
+              <div className="owner-dashboard-chart-card">
+                <Typography variant="h6">{strings.REVENUE_TREND}</Typography>
+                {trendsLoading ? (
+                  <div className="owner-dashboard-chart-loading">Loading...</div>
+                ) : (
+                  <Suspense fallback={<div className="owner-dashboard-chart-loading">Loading...</div>}>
+                    <RevenueChart data={revenueTrend} />
+                  </Suspense>
+                )}
+              </div>
+            </div>
           </div>
 
           {dashboard.revenueBySource.length > 0 && (
