@@ -1,0 +1,47 @@
+.owner-payouts {
+  max-width: 1000px;
+  margin: 50px auto 0;
+  padding: 20px;
+}
+
+.owner-payouts-title {
+  margin-bottom: 24px !important;
+}
+
+.owner-payouts-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.owner-payouts-empty {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.payout-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.payout-status-draft {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.payout-status-approved {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.payout-status-paid {
+  background: #E8F5E9;
+  color: #2E7D32;
+}

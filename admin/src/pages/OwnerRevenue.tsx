@@ -90,6 +90,9 @@ const OwnerRevenue = () => {
   const totalBookings = rows.reduce((sum, r) => sum + r.bookings, 0)
   const totalNights = rows.reduce((sum, r) => sum + r.nights, 0)
   const totalRevenue = rows.reduce((sum, r) => sum + r.grossRevenue, 0)
+  const totalOtaCommission = rows.reduce((sum, r) => sum + r.otaCommission, 0)
+  const totalManagementFee = rows.reduce((sum, r) => sum + r.managementFee, 0)
+  const totalNetToOwner = rows.reduce((sum, r) => sum + r.netToOwner, 0)
 
   return (
     <Layout strict onLoad={onLoad}>
@@ -120,6 +123,9 @@ const OwnerRevenue = () => {
                   <TableCell align="right">{strings.BOOKINGS}</TableCell>
                   <TableCell align="right">{strings.NIGHTS}</TableCell>
                   <TableCell align="right">{strings.GROSS_REVENUE}</TableCell>
+                  <TableCell align="right">{strings.OTA_COMMISSION}</TableCell>
+                  <TableCell align="right">{strings.MANAGEMENT_FEE}</TableCell>
+                  <TableCell align="right">{strings.NET_TO_OWNER}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -130,6 +136,9 @@ const OwnerRevenue = () => {
                     <TableCell align="right">{row.bookings}</TableCell>
                     <TableCell align="right">{row.nights}</TableCell>
                     <TableCell align="right">&euro;{row.grossRevenue.toLocaleString()}</TableCell>
+                    <TableCell align="right">&euro;{row.otaCommission.toLocaleString()}</TableCell>
+                    <TableCell align="right">&euro;{row.managementFee.toLocaleString()}</TableCell>
+                    <TableCell align="right">&euro;{row.netToOwner.toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
                 <TableRow className="owner-revenue-total-row">
@@ -137,6 +146,9 @@ const OwnerRevenue = () => {
                   <TableCell align="right"><strong>{totalBookings}</strong></TableCell>
                   <TableCell align="right"><strong>{totalNights}</strong></TableCell>
                   <TableCell align="right"><strong>&euro;{totalRevenue.toLocaleString()}</strong></TableCell>
+                  <TableCell align="right"><strong>&euro;{totalOtaCommission.toLocaleString()}</strong></TableCell>
+                  <TableCell align="right"><strong>&euro;{totalManagementFee.toLocaleString()}</strong></TableCell>
+                  <TableCell align="right"><strong>&euro;{totalNetToOwner.toLocaleString()}</strong></TableCell>
                 </TableRow>
               </TableBody>
             </Table>

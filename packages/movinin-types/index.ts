@@ -557,4 +557,75 @@ export interface OwnerRevenueRow {
   bookings: number
   nights: number
   grossRevenue: number
+  otaCommission: number
+  managementFee: number
+  netToOwner: number
+}
+
+//
+// Payout types
+//
+export enum PayoutStatus {
+  Draft = 'DRAFT',
+  Approved = 'APPROVED',
+  Paid = 'PAID',
+}
+
+export interface PayoutBookingLine {
+  bookingId: string
+  source: BookingSource
+  guestName: string
+  checkIn: string
+  checkOut: string
+  nights: number
+  grossRevenue: number
+  otaCommission: number
+  managementFee: number
+  cleaningFee: number
+  netToOwner: number
+}
+
+export interface PayoutPropertyLine {
+  propertyId: string
+  propertyName: string
+  bookings: PayoutBookingLine[]
+  totalGross: number
+  totalOtaCommission: number
+  totalManagementFee: number
+  totalCleaningFee: number
+  totalNetToOwner: number
+}
+
+export interface OwnerPayout {
+  _id?: string
+  ownerId: string | User
+  period: {
+    month: number
+    year: number
+  }
+  properties: PayoutPropertyLine[]
+  totalPayout: number
+  status: PayoutStatus
+  paidAt?: Date
+  paymentMethod?: string
+  notes?: string
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface GetPayoutsQuery {
+  year?: number
+  month?: number
+  status?: PayoutStatus
+  ownerId?: string
+}
+
+export interface ApprovePayoutsPayload {
+  ids: string[]
+}
+
+export interface MarkPayoutsPaidPayload {
+  ids: string[]
+  paymentMethod?: string
+  notes?: string
 }

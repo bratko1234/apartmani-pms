@@ -3,6 +3,7 @@ import * as movininTypes from ':movinin-types'
 import * as logger from '../utils/logger'
 import Booking from '../models/Booking'
 import Property from '../models/Property'
+import { calculateBookingFinancials } from '../services/payoutService'
 
 /**
  * Get owner dashboard data.
@@ -135,6 +136,8 @@ export const getRevenue = async (req: Request, res: Response) => {
         (new Date(booking.to).getTime() - new Date(booking.from).getTime()) / (1000 * 60 * 60 * 24),
       )
 
+      const financials = calculateBookingFinancials(booking.price, source)
+
       const existing = revenueMap.get(key)
       if (existing) {
         revenueMap.set(key, {
@@ -142,6 +145,9 @@ export const getRevenue = async (req: Request, res: Response) => {
           bookings: existing.bookings + 1,
           nights: existing.nights + nights,
           grossRevenue: existing.grossRevenue + booking.price,
+          otaCommission: Math.round((existing.otaCommission + financials.otaCommission) * 100) / 100,
+          managementFee: Math.round((existing.managementFee + financials.managementFee) * 100) / 100,
+          netToOwner: Math.round((existing.netToOwner + financials.netToOwner) * 100) / 100,
         })
       } else {
         revenueMap.set(key, {
@@ -151,6 +157,9 @@ export const getRevenue = async (req: Request, res: Response) => {
           bookings: 1,
           nights,
           grossRevenue: booking.price,
+          otaCommission: financials.otaCommission,
+          managementFee: financials.managementFee,
+          netToOwner: financials.netToOwner,
         })
       }
     }
