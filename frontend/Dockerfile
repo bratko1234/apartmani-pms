@@ -3,7 +3,7 @@
 FROM node:lts-alpine AS build
 WORKDIR /movinin/frontend
 COPY ./frontend ./
-COPY ./frontend/.env.docker .env
+COPY ./frontend/.env.docker.example .env
 COPY ./packages /movinin/packages
 RUN npm install --force
 RUN npm run build

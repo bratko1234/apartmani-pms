@@ -3,7 +3,7 @@
 FROM node:lts-alpine AS build
 WORKDIR /movinin/admin
 COPY ./admin ./
-COPY ./admin/.env.docker .env
+COPY ./admin/.env.docker.example .env
 COPY ./packages /movinin/packages
 RUN npm install --force
 RUN npm run build
