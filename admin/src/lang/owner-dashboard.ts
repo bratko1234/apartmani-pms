@@ -20,6 +20,12 @@ const strings = new LocalizedStrings({
     CHECK_OUT: 'Départ',
     STATUS: 'Statut',
     NO_DATA: 'Aucune donnée disponible',
+    TRENDS: 'Tendances',
+    OCCUPANCY_TREND: "Tendance du taux d'occupation",
+    REVENUE_TREND: 'Tendance des revenus',
+    PERIOD_6M: '6M',
+    PERIOD_12M: '12M',
+    PERIOD_YTD: 'YTD',
   },
   en: {
     TITLE: 'Owner Dashboard',
@@ -39,6 +45,12 @@ const strings = new LocalizedStrings({
     CHECK_OUT: 'Check-out',
     STATUS: 'Status',
     NO_DATA: 'No data available',
+    TRENDS: 'Trends',
+    OCCUPANCY_TREND: 'Occupancy Trend',
+    REVENUE_TREND: 'Revenue Trend',
+    PERIOD_6M: '6M',
+    PERIOD_12M: '12M',
+    PERIOD_YTD: 'YTD',
   },
   sr: {
     TITLE: 'Portal za vlasnike',
@@ -58,6 +70,12 @@ const strings = new LocalizedStrings({
     CHECK_OUT: 'Odjava',
     STATUS: 'Status',
     NO_DATA: 'Nema dostupnih podataka',
+    TRENDS: 'Trendovi',
+    OCCUPANCY_TREND: 'Trend popunjenosti',
+    REVENUE_TREND: 'Trend prihoda',
+    PERIOD_6M: '6M',
+    PERIOD_12M: '12M',
+    PERIOD_YTD: 'YTD',
   },
 })
 

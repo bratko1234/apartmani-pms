@@ -558,3 +558,18 @@ export interface OwnerRevenueRow {
   nights: number
   grossRevenue: number
 }
+
+export interface OccupancyTrendPoint {
+  month: string
+  occupancyRate: number
+}
+
+export interface RevenueTrendPoint {
+  month: string
+  direct: number
+  airbnb: number
+  bookingCom: number
+  expedia: number
+  other: number
+  total: number
+}

@@ -24,3 +24,25 @@ export const getCalendar = (propertyId: string, year: number, month: number): Pr
   axiosInstance
     .get(`/api/owner/calendar/${propertyId}/${year}/${month}`, { withCredentials: true })
     .then((res) => res.data)
+
+/**
+ * Get occupancy trend for the past N months.
+ */
+export const getOccupancyTrend = (months?: number): Promise<movininTypes.OccupancyTrendPoint[]> =>
+  axiosInstance
+    .get('/api/owner/occupancy-trend', {
+      withCredentials: true,
+      params: months ? { months } : undefined,
+    })
+    .then((res) => res.data)
+
+/**
+ * Get revenue trend for the past N months, broken down by source.
+ */
+export const getRevenueTrend = (months?: number): Promise<movininTypes.RevenueTrendPoint[]> =>
+  axiosInstance
+    .get('/api/owner/revenue-trend', {
+      withCredentials: true,
+      params: months ? { months } : undefined,
+    })
+    .then((res) => res.data)
