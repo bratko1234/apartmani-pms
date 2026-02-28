@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
+  Button,
   Card,
   CardContent,
   Typography,
@@ -11,8 +13,10 @@ import {
   TableRow,
   Paper,
 } from '@mui/material'
+import MailIcon from '@mui/icons-material/Mail'
 import * as movininTypes from ':movinin-types'
 import Layout from '@/components/Layout'
+import MessageBadge from '@/components/MessageBadge'
 import { strings } from '@/lang/owner-dashboard'
 import * as OwnerService from '@/services/OwnerService'
 import * as helper from '@/utils/helper'
@@ -20,6 +24,7 @@ import * as helper from '@/utils/helper'
 import '@/assets/css/owner-dashboard.css'
 
 const OwnerDashboard = () => {
+  const navigate = useNavigate()
   const [user, setUser] = useState<movininTypes.User>()
   const [dashboard, setDashboard] = useState<movininTypes.OwnerDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -62,9 +67,12 @@ const OwnerDashboard = () => {
     <Layout strict onLoad={onLoad}>
       {!loading && dashboard && (
         <div className="owner-dashboard">
-          <Typography variant="h4" className="owner-dashboard-title">
-            {strings.TITLE}
-          </Typography>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Typography variant="h4" className="owner-dashboard-title" style={{ marginBottom: 0 }}>
+              {strings.TITLE}
+            </Typography>
+            <MessageBadge />
+          </div>
 
           <div className="owner-dashboard-cards">
             <Card className="owner-dashboard-card">
@@ -136,6 +144,7 @@ const OwnerDashboard = () => {
                       <TableCell>{strings.CHECK_IN}</TableCell>
                       <TableCell>{strings.CHECK_OUT}</TableCell>
                       <TableCell>{strings.STATUS}</TableCell>
+                      <TableCell />
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -149,6 +158,15 @@ const OwnerDashboard = () => {
                           <TableCell>{new Date(booking.from).toLocaleDateString()}</TableCell>
                           <TableCell>{new Date(booking.to).toLocaleDateString()}</TableCell>
                           <TableCell>{booking.status}</TableCell>
+                          <TableCell>
+                            <Button
+                              size="small"
+                              variant="text"
+                              onClick={() => navigate(`/messages?b=${booking._id}`)}
+                            >
+                              <MailIcon fontSize="small" />
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       )
                     })}

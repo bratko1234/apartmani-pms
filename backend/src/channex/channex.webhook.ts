@@ -4,6 +4,7 @@ import * as movininTypes from ':movinin-types'
 import * as env from '../config/env.config'
 import * as logger from '../utils/logger'
 import * as channexMapper from './channex.mapper'
+import * as messageService from '../services/messageService'
 import Booking from '../models/Booking'
 import ChannexMapping from '../models/ChannexMapping'
 import ChannexWebhookLog from '../models/ChannexWebhookLog'
@@ -67,6 +68,9 @@ export const handleWebhook = async (req: Request, res: Response): Promise<void> 
         break
       case 'booking_cancellation':
         await handleBookingCancellation(payload)
+        break
+      case 'message_new':
+        await handleNewMessage(payload)
         break
       default:
         logger.info(`[channex.webhook] Unhandled event type: ${eventType}`)
@@ -184,6 +188,40 @@ const handleBookingCancellation = async (payload: Record<string, unknown>): Prom
 
   logger.info(`[channex.webhook] Booking ${booking._id} cancelled`)
   await notifyAgency(booking.agency.toString(), booking._id.toString(), 'OTA booking has been cancelled')
+}
+
+const handleNewMessage = async (payload: Record<string, unknown>): Promise<void> => {
+  const data = (payload.data || payload) as Record<string, unknown>
+  const attributes = (data.attributes || data) as Record<string, unknown>
+
+  const channexBookingId = (attributes.booking_id || attributes.reservation_id || '') as string
+  const messageContent = (attributes.message || attributes.content || attributes.text || '') as string
+  const channexMessageId = (data.id || '') as string
+  const senderName = (attributes.sender_name || attributes.guest_name || 'Guest') as string
+
+  if (!channexBookingId) {
+    logger.error('[channex.webhook] No booking ID in message payload')
+    return
+  }
+
+  const booking = await Booking.findOne({ channexBookingId })
+  if (!booking) {
+    logger.info(`[channex.webhook] Booking ${channexBookingId} not found for message`)
+    return
+  }
+
+  await messageService.createMessage({
+    booking: booking._id.toString(),
+    property: booking.property.toString(),
+    sender: 'guest',
+    senderName,
+    content: messageContent,
+    source: booking.source || movininTypes.BookingSource.Other,
+    channexMessageId,
+  })
+
+  logger.info(`[channex.webhook] New message created for booking ${booking._id}`)
+  await notifyAgency(booking.agency.toString(), booking._id.toString(), `New message from ${senderName}`)
 }
 
 const extractRoomTypeId = (data: Record<string, unknown>): string | null => {

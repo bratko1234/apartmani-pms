@@ -195,4 +195,28 @@ export const saveMapping = async (
   )
 }
 
+/**
+ * Send a message to a guest via Channex Messaging API.
+ */
+export const sendMessage = async (channexBookingId: string, content: string): Promise<string | null> => {
+  if (!isEnabled()) {
+    logger.info('[channex] Integration disabled, skipping sendMessage')
+    return null
+  }
+
+  try {
+    const response = await getClient().post(`/bookings/${channexBookingId}/messages`, {
+      message: {
+        message: content,
+      },
+    })
+    const messageId = response.data?.data?.id
+    logger.info(`[channex] Message sent for booking ${channexBookingId}: ${messageId}`)
+    return messageId
+  } catch (err) {
+    logger.error(`[channex] Failed to send message for booking ${channexBookingId}`, err)
+    throw err
+  }
+}
+
 export { isEnabled }
