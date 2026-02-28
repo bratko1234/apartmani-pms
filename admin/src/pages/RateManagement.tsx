@@ -40,6 +40,8 @@ import { strings as commonStrings } from '@/lang/common'
 import { strings } from '@/lang/rate-management'
 import * as RateService from '@/services/RateService'
 import * as PropertyService from '@/services/PropertyService'
+import * as AgencyService from '@/services/AgencyService'
+import * as movininHelper from ':movinin-helper'
 import * as helper from '@/utils/helper'
 import Backdrop from '@/components/SimpleBackdrop'
 
@@ -139,9 +141,18 @@ const RateManagement = () => {
   // Property search
   const [propertyOptions, setPropertyOptions] = useState<movininTypes.Property[]>([])
   const [propertySearchInput, setPropertySearchInput] = useState('')
+  const [agencies, setAgencies] = useState<string[]>([])
 
-  const onLoad = (_user?: movininTypes.User) => {
+  const onLoad = async (_user?: movininTypes.User) => {
     setUser(_user)
+    if (_user) {
+      if (helper.admin(_user)) {
+        const allAgencies = await AgencyService.getAllAgencies()
+        setAgencies(movininHelper.flattenAgencies(allAgencies))
+      } else if (_user._id) {
+        setAgencies([_user._id])
+      }
+    }
   }
 
   const fetchData = useCallback(async (pid: string) => {
@@ -174,20 +185,18 @@ const RateManagement = () => {
 
   // Search properties for autocomplete
   useEffect(() => {
-    if (!user || propertySearchInput.length < 2) {
+    if (!user || agencies.length === 0 || propertySearchInput.length < 2) {
       return
     }
 
     const searchTimeout = setTimeout(async () => {
       try {
         const payload: movininTypes.GetPropertiesPayload = {
-          agencies: user.type === movininTypes.UserType.Agency && user._id
-            ? [user._id]
-            : [],
+          agencies,
         }
         const result = await PropertyService.getProperties(propertySearchInput, payload, 1, 20)
-        if (result && result.length > 0 && result[0].resultData) {
-          setPropertyOptions(result[0].resultData)
+        if (result && result.length > 0 && result[0]?.resultData) {
+          setPropertyOptions(result[0]?.resultData ?? [])
         }
       } catch (err) {
         helper.error(err)
@@ -195,7 +204,7 @@ const RateManagement = () => {
     }, 300)
 
     return () => clearTimeout(searchTimeout)
-  }, [propertySearchInput, user])
+  }, [propertySearchInput, user, agencies])
 
   // ------- Season handlers -------
 

@@ -50,7 +50,7 @@ export const getSitemap = async (_req: Request, res: Response) => {
     const properties = await Property.find(
       { available: true, hidden: { $ne: true } },
       { _id: 1, name: 1, updatedAt: 1 },
-    ).lean() as Array<{ _id: string; name: string; updatedAt?: Date }>
+    ).lean() as unknown as Array<{ _id: string; name: string; updatedAt?: Date }>
 
     const staticEntries = staticPages
       .map(

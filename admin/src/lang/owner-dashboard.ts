@@ -26,6 +26,8 @@ const strings = new LocalizedStrings({
     PERIOD_6M: '6M',
     PERIOD_12M: '12M',
     PERIOD_YTD: 'YTD',
+    FILTER_OWNER: 'Propriétaire',
+    ALL_OWNERS: 'Tous les propriétaires',
   },
   en: {
     TITLE: 'Owner Dashboard',
@@ -51,6 +53,8 @@ const strings = new LocalizedStrings({
     PERIOD_6M: '6M',
     PERIOD_12M: '12M',
     PERIOD_YTD: 'YTD',
+    FILTER_OWNER: 'Owner',
+    ALL_OWNERS: 'All Owners',
   },
   sr: {
     TITLE: 'Portal za vlasnike',
@@ -76,6 +80,8 @@ const strings = new LocalizedStrings({
     PERIOD_6M: '6M',
     PERIOD_12M: '12M',
     PERIOD_YTD: 'YTD',
+    FILTER_OWNER: 'Vlasnik',
+    ALL_OWNERS: 'Svi vlasnici',
   },
 })
 

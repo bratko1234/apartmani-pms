@@ -20,6 +20,10 @@ const strings = new LocalizedStrings({
     OWNER_DASHBOARD: 'Tableau de bord propriétaire',
     OWNER_CALENDAR: 'Calendrier',
     OWNER_REVENUE: 'Revenu',
+    PAYOUTS: 'Versements',
+    RATE_MANAGEMENT: 'Gestion des tarifs',
+    MESSAGES: 'Messages',
+    STATEMENTS: 'Relevés',
   },
   en: {
     DASHBOARD: 'Dashboard',
@@ -39,6 +43,10 @@ const strings = new LocalizedStrings({
     OWNER_DASHBOARD: 'Owner Dashboard',
     OWNER_CALENDAR: 'Calendar',
     OWNER_REVENUE: 'Revenue',
+    PAYOUTS: 'Payouts',
+    RATE_MANAGEMENT: 'Rate Management',
+    MESSAGES: 'Messages',
+    STATEMENTS: 'Statements',
   },
   sr: {
     DASHBOARD: 'Kontrolna tabla',
@@ -58,6 +66,10 @@ const strings = new LocalizedStrings({
     OWNER_DASHBOARD: 'Portal za vlasnike',
     OWNER_CALENDAR: 'Kalendar',
     OWNER_REVENUE: 'Prihod',
+    PAYOUTS: 'Isplate',
+    RATE_MANAGEMENT: 'Upravljanje cijenama',
+    MESSAGES: 'Poruke',
+    STATEMENTS: 'Izvještaji',
   },
 })
 

@@ -4,44 +4,94 @@ import * as movininTypes from ':movinin-types'
 import * as logger from '../utils/logger'
 import Booking from '../models/Booking'
 import Property from '../models/Property'
+import User from '../models/User'
 import { calculateBookingFinancials } from '../services/payoutService'
+
+/**
+ * Resolve the effective agency filter for owner endpoints.
+ * - Admin with ?ownerId= → use that specific owner
+ * - Admin without ?ownerId= → all agencies (returns null to skip agency filter)
+ * - Agency user → always their own ID
+ */
+const resolveAgencyFilter = async (req: Request): Promise<mongoose.Types.ObjectId[] | null> => {
+  const user = req.user
+  if (!user?._id) {
+    return []
+  }
+
+  const isAdmin = user.type === movininTypes.UserType.Admin
+  const ownerIdParam = req.query.ownerId as string | undefined
+
+  if (isAdmin && ownerIdParam) {
+    return [new mongoose.Types.ObjectId(ownerIdParam)]
+  }
+
+  if (isAdmin) {
+    const agencies = await User.find({ type: movininTypes.UserType.Agency }).select('_id').lean()
+    return agencies.map((a) => a._id as mongoose.Types.ObjectId)
+  }
+
+  return [new mongoose.Types.ObjectId(String(user._id))]
+}
 
 /**
  * Get owner dashboard data.
  * Returns aggregate stats for the agency's properties.
+ * Admin sees all agencies or a specific one via ?ownerId=
  */
 export const getDashboard = async (req: Request, res: Response) => {
   try {
-    const agencyId = req.user?._id
-    if (!agencyId) {
+    if (!req.user?._id) {
       res.sendStatus(401)
       return
     }
+
+    const agencyIds = await resolveAgencyFilter(req)
+    if (!agencyIds || agencyIds.length === 0) {
+      const emptyDashboard: movininTypes.OwnerDashboardData = {
+        totalBookings: 0,
+        upcomingBookings: 0,
+        occupancyRate: 0,
+        totalRevenue: 0,
+        revenueBySource: [],
+        upcomingBookingsList: [],
+      }
+      res.status(200).send(emptyDashboard)
+      return
+    }
+
+    const agencyFilter = { $in: agencyIds }
 
     const now = new Date()
     const thirtyDaysFromNow = new Date()
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
 
-    const properties = await Property.find({ agency: agencyId }).select('_id').lean()
+    const properties = await Property.find({ agency: agencyFilter }).select('_id').lean()
     const propertyIds = properties.map((p) => p._id)
+
+    const activeStatuses = [
+      movininTypes.BookingStatus.Paid,
+      movininTypes.BookingStatus.Reserved,
+      movininTypes.BookingStatus.Deposit,
+    ]
 
     const [totalBookings, upcomingBookings, revenueAgg, upcomingBookingsList] = await Promise.all([
       Booking.countDocuments({
-        agency: agencyId,
-        status: { $in: [movininTypes.BookingStatus.Paid, movininTypes.BookingStatus.Reserved, movininTypes.BookingStatus.Deposit] },
+        agency: agencyFilter,
+        status: { $in: activeStatuses },
       }),
 
       Booking.countDocuments({
-        agency: agencyId,
+        agency: agencyFilter,
         from: { $gte: now, $lte: thirtyDaysFromNow },
-        status: { $in: [movininTypes.BookingStatus.Paid, movininTypes.BookingStatus.Reserved, movininTypes.BookingStatus.Deposit] },
+        status: { $in: activeStatuses },
       }),
 
       Booking.aggregate([
         {
           $match: {
-            agency: { $in: [agencyId].map((id) => new mongoose.Types.ObjectId(id)) },
-            status: { $in: [movininTypes.BookingStatus.Paid, movininTypes.BookingStatus.Reserved, movininTypes.BookingStatus.Deposit] },
+            agency: agencyFilter,
+            status: { $in: activeStatuses },
           },
         },
         {
@@ -59,9 +109,9 @@ export const getDashboard = async (req: Request, res: Response) => {
       ]),
 
       Booking.find({
-        agency: agencyId,
+        agency: agencyFilter,
         from: { $gte: now },
-        status: { $in: [movininTypes.BookingStatus.Paid, movininTypes.BookingStatus.Reserved, movininTypes.BookingStatus.Deposit] },
+        status: { $in: activeStatuses },
       })
         .sort({ from: 1 })
         .limit(10)
@@ -105,12 +155,18 @@ export const getDashboard = async (req: Request, res: Response) => {
  */
 export const getRevenue = async (req: Request, res: Response) => {
   try {
-    const agencyId = req.user?._id
-    if (!agencyId) {
+    if (!req.user?._id) {
       res.sendStatus(401)
       return
     }
 
+    const agencyIds = await resolveAgencyFilter(req)
+    if (!agencyIds || agencyIds.length === 0) {
+      res.status(200).send([])
+      return
+    }
+
+    const agencyFilter = { $in: agencyIds }
     const year = parseInt(req.params.year, 10)
     const month = parseInt(req.params.month, 10)
 
@@ -118,7 +174,7 @@ export const getRevenue = async (req: Request, res: Response) => {
     const endDate = new Date(year, month, 1)
 
     const bookings = await Booking.find({
-      agency: agencyId,
+      agency: agencyFilter,
       from: { $lt: endDate },
       to: { $gt: startDate },
       status: { $in: [movininTypes.BookingStatus.Paid, movininTypes.BookingStatus.Reserved, movininTypes.BookingStatus.Deposit] },
@@ -177,8 +233,7 @@ export const getRevenue = async (req: Request, res: Response) => {
  */
 export const getCalendar = async (req: Request, res: Response) => {
   try {
-    const agencyId = req.user?._id
-    if (!agencyId) {
+    if (!req.user?._id) {
       res.sendStatus(401)
       return
     }
@@ -187,7 +242,14 @@ export const getCalendar = async (req: Request, res: Response) => {
     const year = parseInt(req.params.year, 10)
     const month = parseInt(req.params.month, 10)
 
-    const property = await Property.findOne({ _id: propertyId, agency: agencyId }).lean()
+    // Admin can view any property; agency can only view their own
+    const isAdmin = req.user.type === movininTypes.UserType.Admin
+    const propertyQuery: Record<string, unknown> = { _id: propertyId }
+    if (!isAdmin) {
+      propertyQuery.agency = req.user._id
+    }
+
+    const property = await Property.findOne(propertyQuery).lean()
     if (!property) {
       res.status(404).send({ message: 'Property not found' })
       return
@@ -249,15 +311,21 @@ export const getCalendar = async (req: Request, res: Response) => {
  */
 export const getOccupancyTrend = async (req: Request, res: Response) => {
   try {
-    const agencyId = req.user?._id
-    if (!agencyId) {
+    if (!req.user?._id) {
       res.sendStatus(401)
       return
     }
 
+    const agencyIds = await resolveAgencyFilter(req)
+    if (!agencyIds || agencyIds.length === 0) {
+      res.status(200).send([])
+      return
+    }
+
+    const agencyFilter = { $in: agencyIds }
     const months = Math.min(parseInt(req.query.months as string, 10) || 12, 24)
 
-    const properties = await Property.find({ agency: agencyId }).select('_id').lean()
+    const properties = await Property.find({ agency: agencyFilter }).select('_id').lean()
     const propertyCount = properties.length
 
     if (propertyCount === 0) {
@@ -287,7 +355,7 @@ export const getOccupancyTrend = async (req: Request, res: Response) => {
       const totalAvailableNights = propertyCount * daysInMonth
 
       const bookings = await Booking.find({
-        agency: agencyId,
+        agency: agencyFilter,
         from: { $lt: monthEnd },
         to: { $gt: monthStart },
         status: { $in: activeStatuses },
@@ -327,12 +395,18 @@ export const getOccupancyTrend = async (req: Request, res: Response) => {
  */
 export const getRevenueTrend = async (req: Request, res: Response) => {
   try {
-    const agencyId = req.user?._id
-    if (!agencyId) {
+    if (!req.user?._id) {
       res.sendStatus(401)
       return
     }
 
+    const agencyIds = await resolveAgencyFilter(req)
+    if (!agencyIds || agencyIds.length === 0) {
+      res.status(200).send([])
+      return
+    }
+
+    const agencyFilter = { $in: agencyIds }
     const months = Math.min(parseInt(req.query.months as string, 10) || 12, 24)
 
     const now = new Date()
@@ -350,7 +424,7 @@ export const getRevenueTrend = async (req: Request, res: Response) => {
     ]
 
     const bookings = await Booking.find({
-      agency: agencyId,
+      agency: agencyFilter,
       from: { $lt: periodEnd },
       to: { $gt: periodStart },
       status: { $in: activeStatuses },

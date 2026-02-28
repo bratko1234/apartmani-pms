@@ -35,6 +35,10 @@ import {
   AccountBalance as OwnerDashboardIcon,
   EventNote as OwnerCalendarIcon,
   AttachMoney as OwnerRevenueIcon,
+  Receipt as PayoutsIcon,
+  TrendingUp as RateManagementIcon,
+  Chat as MessagesIcon,
+  AccountBalanceWallet as StatementsIcon,
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as movininTypes from ':movinin-types'
@@ -330,18 +334,56 @@ const Header = ({
                       <ListItemIcon><OwnerRevenueIcon /></ListItemIcon>
                       <ListItemText primary={strings.OWNER_REVENUE} />
                     </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/owner-payouts')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><StatementsIcon /></ListItemIcon>
+                      <ListItemText primary={strings.STATEMENTS} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/messages')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><MessagesIcon /></ListItemIcon>
+                      <ListItemText primary={strings.MESSAGES} />
+                    </ListItem>
                   </>
                 )}
                 {user?.type === movininTypes.UserType.Admin && (
-                  <ListItem
-                    onClick={() => {
-                      navigate('/agencies')
-                      handleSideMenuClose()
-                    }}
-                  >
-                    <ListItemIcon><AgenciesIcon /></ListItemIcon>
-                    <ListItemText primary={strings.AGENCIES} />
-                  </ListItem>
+                  <>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/payouts')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><PayoutsIcon /></ListItemIcon>
+                      <ListItemText primary={strings.PAYOUTS} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/rate-management')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><RateManagementIcon /></ListItemIcon>
+                      <ListItemText primary={strings.RATE_MANAGEMENT} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/agencies')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><AgenciesIcon /></ListItemIcon>
+                      <ListItemText primary={strings.AGENCIES} />
+                    </ListItem>
+                  </>
                 )}
                 {user?.type === movininTypes.UserType.Admin && (
                   <ListItem

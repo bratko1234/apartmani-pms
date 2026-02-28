@@ -335,11 +335,16 @@ const BookingList = ({
         field: 'agency',
         headerName: commonStrings.AGENCY,
         flex: 1,
-        renderCell: ({ row, value }: GridRenderCellParams<movininTypes.Booking, string>) => (
-          <Link href={`/agency?c=${(row.agency as movininTypes.User)._id}`} className="cell-agency">
-            <img src={movininHelper.joinURL(env.CDN_USERS, (row.agency as movininTypes.User).avatar)} alt={value} />
-          </Link>
-        ),
+        renderCell: ({ row, value }: GridRenderCellParams<movininTypes.Booking, string>) => {
+          const agency = row.agency as movininTypes.User
+          return (
+            <Link href={`/agency?c=${agency._id}`} className="cell-agency">
+              {agency.avatar
+                ? <img src={movininHelper.joinURL(env.CDN_USERS, agency.avatar)} alt={value} />
+                : <span>{agency.fullName}</span>}
+            </Link>
+          )
+        },
         valueGetter: (value: movininTypes.User) => value?.fullName,
       })
     }
@@ -532,7 +537,9 @@ const BookingList = ({
                       <span className="booking-detail-title">{commonStrings.AGENCY}</span>
                       <div className="booking-detail-value">
                         <div className="property-agency">
-                          <img src={movininHelper.joinURL(env.CDN_USERS, (booking.agency as movininTypes.User).avatar)} alt={(booking.agency as movininTypes.User).fullName} />
+                          {(booking.agency as movininTypes.User).avatar
+                            ? <img src={movininHelper.joinURL(env.CDN_USERS, (booking.agency as movininTypes.User).avatar)} alt={(booking.agency as movininTypes.User).fullName} />
+                            : null}
                           <span className="property-agency-name">{(booking.agency as movininTypes.User).fullName}</span>
                         </div>
                       </div>

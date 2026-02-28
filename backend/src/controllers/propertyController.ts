@@ -671,12 +671,17 @@ export const getProperties = async (req: Request, res: Response) => {
     const options = 'i'
     // const language = body.language || env.DEFAULT_LANGUAGE
 
+    const $matchAnd: mongoose.FilterQuery<movininTypes.Property>[] = [
+      { agency: { $in: agencies } },
+    ]
+    if (types.length > 0) {
+      $matchAnd.push({ type: { $in: types } })
+    }
+    if (rentalTerms.length > 0) {
+      $matchAnd.push({ rentalTerm: { $in: rentalTerms } })
+    }
     const $match: mongoose.QueryFilter<movininTypes.Property> = {
-      $and: [
-        { agency: { $in: agencies } },
-        { type: { $in: types } },
-        { rentalTerm: { $in: rentalTerms } },
-      ],
+      $and: $matchAnd,
     }
 
     if (availability) {

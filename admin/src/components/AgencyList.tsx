@@ -15,7 +15,8 @@ import {
 import {
   Visibility as ViewIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  AccountCircle,
 } from '@mui/icons-material'
 import * as movininTypes from ':movinin-types'
 import * as movininHelper from ':movinin-helper'
@@ -202,7 +203,9 @@ const AgencyList = ({
               <article key={agency._id}>
                 <div className="agency-item">
                   <div className="agency-item-avatar">
-                    <img src={movininHelper.joinURL(env.CDN_USERS, agency.avatar)} alt={agency.fullName} />
+                    {agency.avatar
+                      ? <img src={movininHelper.joinURL(env.CDN_USERS, agency.avatar)} alt={agency.fullName} />
+                      : <AccountCircle className="avatar-medium" color="disabled" />}
                   </div>
                   <span className="agency-item-title">{agency.fullName}</span>
                 </div>

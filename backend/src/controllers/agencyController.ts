@@ -250,7 +250,6 @@ export const getAgencies = async (req: Request, res: Response) => {
         {
           $match: {
             type: movininTypes.UserType.Agency,
-            avatar: { $ne: null },
             fullName: { $regex: keyword, $options: options },
           },
         },
@@ -296,7 +295,6 @@ export const getAllAgencies = async (req: Request, res: Response) => {
         {
           $match: {
             type: movininTypes.UserType.Agency,
-            avatar: { $ne: null },
             blacklisted: false,
           },
         },

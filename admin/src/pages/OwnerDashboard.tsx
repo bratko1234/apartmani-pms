@@ -12,6 +12,10 @@ import {
   TableHead,
   TableRow,
   Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import MailIcon from '@mui/icons-material/Mail'
 import * as movininTypes from ':movinin-types'
@@ -19,6 +23,7 @@ import Layout from '@/components/Layout'
 import MessageBadge from '@/components/MessageBadge'
 import { strings } from '@/lang/owner-dashboard'
 import * as OwnerService from '@/services/OwnerService'
+import * as AgencyService from '@/services/AgencyService'
 import * as helper from '@/utils/helper'
 
 import '@/assets/css/owner-dashboard.css'
@@ -42,6 +47,7 @@ const getMonthsForPeriod = (period: TrendPeriod): number => {
 const OwnerDashboard = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState<movininTypes.User>()
+  const [isAdmin, setIsAdmin] = useState(false)
   const [dashboard, setDashboard] = useState<movininTypes.OwnerDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [trendPeriod, setTrendPeriod] = useState<TrendPeriod>('12m')
@@ -49,9 +55,24 @@ const OwnerDashboard = () => {
   const [revenueTrend, setRevenueTrend] = useState<movininTypes.RevenueTrendPoint[]>([])
   const [trendsLoading, setTrendsLoading] = useState(false)
 
-  const onLoad = (_user?: movininTypes.User) => {
+  // Admin: owner selector
+  const [agencies, setAgencies] = useState<movininTypes.User[]>([])
+  const [selectedOwnerId, setSelectedOwnerId] = useState<string>('')
+
+  const onLoad = async (_user?: movininTypes.User) => {
     setUser(_user)
+    if (_user) {
+      const _isAdmin = helper.admin(_user)
+      setIsAdmin(_isAdmin)
+      if (_isAdmin) {
+        const allAgencies = await AgencyService.getAllAgencies()
+        setAgencies(allAgencies)
+      }
+    }
   }
+
+  // The ownerId to pass to the API (empty string = all owners for admin)
+  const effectiveOwnerId = isAdmin ? selectedOwnerId || undefined : undefined
 
   useEffect(() => {
     if (!user) {
@@ -59,8 +80,9 @@ const OwnerDashboard = () => {
     }
 
     const fetchDashboard = async () => {
+      setLoading(true)
       try {
-        const data = await OwnerService.getDashboard()
+        const data = await OwnerService.getDashboard(effectiveOwnerId)
         setDashboard(data)
       } catch (err) {
         helper.error(err)
@@ -70,7 +92,7 @@ const OwnerDashboard = () => {
     }
 
     fetchDashboard()
-  }, [user])
+  }, [user, effectiveOwnerId])
 
   useEffect(() => {
     if (!user) {
@@ -82,8 +104,8 @@ const OwnerDashboard = () => {
       try {
         const months = getMonthsForPeriod(trendPeriod)
         const [occupancyData, revenueData] = await Promise.all([
-          OwnerService.getOccupancyTrend(months),
-          OwnerService.getRevenueTrend(months),
+          OwnerService.getOccupancyTrend(months, effectiveOwnerId),
+          OwnerService.getRevenueTrend(months, effectiveOwnerId),
         ])
         setOccupancyTrend(occupancyData)
         setRevenueTrend(revenueData)
@@ -95,7 +117,7 @@ const OwnerDashboard = () => {
     }
 
     fetchTrends()
-  }, [user, trendPeriod])
+  }, [user, trendPeriod, effectiveOwnerId])
 
   const formatSource = (source: movininTypes.BookingSource): string => {
     const sourceLabels: Record<string, string> = {
@@ -118,11 +140,31 @@ const OwnerDashboard = () => {
     <Layout strict onLoad={onLoad}>
       {!loading && dashboard && (
         <div className="owner-dashboard">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <Typography variant="h4" className="owner-dashboard-title" style={{ marginBottom: 0 }}>
               {strings.TITLE}
             </Typography>
             <MessageBadge />
+
+            {isAdmin && agencies.length > 0 && (
+              <FormControl size="small" style={{ minWidth: 220, marginLeft: 'auto' }}>
+                <InputLabel>{strings.FILTER_OWNER}</InputLabel>
+                <Select
+                  value={selectedOwnerId}
+                  label={strings.FILTER_OWNER}
+                  onChange={(e) => setSelectedOwnerId(e.target.value)}
+                >
+                  <MenuItem value="">
+                    <em>{strings.ALL_OWNERS}</em>
+                  </MenuItem>
+                  {agencies.map((agency) => (
+                    <MenuItem key={agency._id} value={agency._id}>
+                      {agency.fullName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
           </div>
 
           <div className="owner-dashboard-cards">

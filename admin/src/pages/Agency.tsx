@@ -11,7 +11,7 @@ import {
   Tooltip,
   Link
 } from '@mui/material'
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material'
+import { Edit as EditIcon, Delete as DeleteIcon, AccountCircle } from '@mui/icons-material'
 import * as movininTypes from ':movinin-types'
 import * as movininHelper from ':movinin-helper'
 import env from '@/config/env.config'
@@ -155,7 +155,9 @@ const Agency = () => {
               ) : (
                 <div className="property-agency">
                   <span className="property-agency-logo">
-                    <img src={movininHelper.joinURL(env.CDN_USERS, agency.avatar)} alt={agency.fullName} style={{ width: env.AGENCY_IMAGE_WIDTH }} />
+                    {agency.avatar
+                      ? <img src={movininHelper.joinURL(env.CDN_USERS, agency.avatar)} alt={agency.fullName} style={{ width: env.AGENCY_IMAGE_WIDTH }} />
+                      : <AccountCircle style={{ width: env.AGENCY_IMAGE_WIDTH, height: env.AGENCY_IMAGE_WIDTH }} color="disabled" />}
                   </span>
                   <span className="property-agency-info">{agency.fullName}</span>
                 </div>

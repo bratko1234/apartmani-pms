@@ -19,7 +19,7 @@ export const getEffectiveRate = async (
     : { $in: [movininTypes.RateChannel.All, channel] }
 
   const season = await RateSeason.findOne({
-    property: new mongoose.Types.ObjectId(propertyId),
+    property: new mongoose.Types.ObjectId(propertyId) as any,
     active: true,
     startDate: { $lte: date },
     endDate: { $gte: date },
@@ -62,7 +62,7 @@ export const getRateSchedule = async (
     : { $in: [movininTypes.RateChannel.All, channel] }
 
   const seasons = await RateSeason.find({
-    property: new mongoose.Types.ObjectId(propertyId),
+    property: new mongoose.Types.ObjectId(propertyId) as any,
     active: true,
     startDate: { $lte: to },
     endDate: { $gte: from },
@@ -126,7 +126,7 @@ export const calculateStayPrice = async (
     : { $in: [movininTypes.DiscountChannel.All] }
 
   const discounts = await RateDiscount.find({
-    property: new mongoose.Types.ObjectId(propertyId),
+    property: new mongoose.Types.ObjectId(propertyId) as any,
     active: true,
     channelRestriction: discountChannelFilter,
   }).lean()
@@ -336,7 +336,7 @@ export const deleteSeason = async (id: string): Promise<boolean> => {
 
 export const getSeasons = async (propertyId: string): Promise<movininTypes.RateSeason[]> => {
   const seasons = await RateSeason.find({
-    property: new mongoose.Types.ObjectId(propertyId),
+    property: new mongoose.Types.ObjectId(propertyId) as any,
   })
     .sort({ startDate: 1 })
     .lean()
@@ -409,7 +409,7 @@ export const deleteDiscount = async (id: string): Promise<boolean> => {
 
 export const getDiscounts = async (propertyId: string): Promise<movininTypes.RateDiscount[]> => {
   const discounts = await RateDiscount.find({
-    property: new mongoose.Types.ObjectId(propertyId),
+    property: new mongoose.Types.ObjectId(propertyId) as any,
   })
     .sort({ type: 1 })
     .lean()

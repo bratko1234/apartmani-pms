@@ -1,10 +1,16 @@
 import { Request, Response } from 'express'
-import * as movininTypes from ':movinin-types'
-import * as movininHelper from ':movinin-helper'
 import i18n from '../lang/i18n'
 import Property from '../models/Property'
 import * as discountService from '../services/discountService'
 import * as logger from '../utils/logger'
+
+/**
+ * Calculate the number of days between two dates.
+ */
+const daysBetween = (from: Date, to: Date): number => {
+  const msPerDay = 1000 * 60 * 60 * 24
+  return Math.ceil((to.getTime() - from.getTime()) / msPerDay)
+}
 
 /**
  * Calculate member discount for a property booking.
@@ -40,17 +46,8 @@ export const calculate = async (req: Request, res: Response) => {
       return
     }
 
-    const propertyForCalc = {
-      price: property.price,
-      rentalTerm: property.rentalTerm,
-      cancellation: property.cancellation ?? 0,
-    } as unknown as movininTypes.Property
-
-    const basePrice = movininHelper.calculateTotalPrice(
-      propertyForCalc,
-      fromDate,
-      toDate,
-    )
+    const nights = daysBetween(fromDate, toDate)
+    const basePrice = property.price * nights
 
     const discount = await discountService.calculateMemberDiscount(
       basePrice,
