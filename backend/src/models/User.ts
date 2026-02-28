@@ -99,6 +99,17 @@ const userSchema = new Schema<env.User>(
     customerId: {
       type: String,
     },
+    isMember: {
+      type: Boolean,
+      default: false,
+    },
+    memberSince: {
+      type: Date,
+    },
+    totalBookings: {
+      type: Number,
+      default: 0,
+    },
     expireAt: {
       //
       // Non verified and active users created from checkout with Stripe are temporary and

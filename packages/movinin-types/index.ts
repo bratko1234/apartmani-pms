@@ -279,6 +279,17 @@ export interface User {
   accessToken?: string
   checked?: boolean
   customerId?: string
+  isMember?: boolean
+  memberSince?: Date
+  totalBookings?: number
+}
+
+export interface DiscountResult {
+  originalPrice: number
+  discountPercent: number
+  discountAmount: number
+  finalPrice: number
+  discountLabel: string
 }
 
 export interface Option {

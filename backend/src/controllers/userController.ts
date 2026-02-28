@@ -59,6 +59,13 @@ const _signup = async (req: Request, res: Response, userType: movininTypes.UserT
     body.password = passwordHash
 
     user = new User(body)
+
+    // Auto-enroll regular users as members
+    if (userType === movininTypes.UserType.User) {
+      user.isMember = true
+      user.memberSince = new Date()
+    }
+
     await user.save()
 
     // avatar
@@ -584,6 +591,7 @@ export const signin = async (req: Request, res: Response) => {
         enableEmailNotifications: user.enableEmailNotifications,
         blacklisted: user.blacklisted,
         avatar: user.avatar,
+        isMember: user.isMember,
       }
 
       //
@@ -669,6 +677,8 @@ export const socialSignin = async (req: Request, res: Response) => {
         type: movininTypes.UserType.User,
         blacklisted: false,
         avatar,
+        isMember: true,
+        memberSince: new Date(),
       })
       await user.save()
     }
@@ -706,6 +716,7 @@ export const socialSignin = async (req: Request, res: Response) => {
       enableEmailNotifications: user.enableEmailNotifications,
       blacklisted: user.blacklisted,
       avatar: user.avatar,
+      isMember: user.isMember,
     }
 
     //
@@ -1215,6 +1226,9 @@ export const getUser = async (req: Request, res: Response) => {
       birthDate: 1,
       payLater: 1,
       customerId: 1,
+      isMember: 1,
+      memberSince: 1,
+      totalBookings: 1,
     }).lean()
 
     if (!user) {

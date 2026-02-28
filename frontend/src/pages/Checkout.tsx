@@ -32,6 +32,7 @@ import * as UserService from '@/services/UserService'
 import * as PropertyService from '@/services/PropertyService'
 import * as LocationService from '@/services/LocationService'
 import * as PaymentService from '@/services/PaymentService'
+import * as DiscountService from '@/services/DiscountService'
 import * as StripeService from '@/services/StripeService'
 import * as PayPalService from '@/services/PayPalService'
 import { useRecaptchaContext, RecaptchaContextType } from '@/context/RecaptchaContext'
@@ -378,7 +379,25 @@ const Checkout = () => {
         return
       }
 
-      const _price = await PaymentService.convertPrice(movininHelper.calculateTotalPrice(_property, _from, _to))
+      let _price = await PaymentService.convertPrice(movininHelper.calculateTotalPrice(_property, _from, _to))
+
+      // Apply member discount for authenticated members
+      if (_user?.isMember && _user._id) {
+        try {
+          const discountResult = await DiscountService.calculateDiscount(
+            propertyId,
+            _from,
+            _to,
+            _user._id,
+          )
+          if (discountResult.discountPercent > 0) {
+            const convertedFinal = await PaymentService.convertPrice(discountResult.finalPrice)
+            _price = convertedFinal
+          }
+        } catch {
+          // Discount service unavailable is non-fatal
+        }
+      }
 
       const included = (val: number) => val === 0
 
@@ -680,6 +699,7 @@ const Checkout = () => {
                 to={to}
                 language={language}
                 hideBookButton
+                user={user}
               />
               <TrustBadges />
             </div>
