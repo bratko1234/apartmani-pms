@@ -49,6 +49,7 @@ const PayoutList = lazy(() => import('@/pages/PayoutList'))
 const PayoutDetail = lazy(() => import('@/pages/PayoutDetail'))
 const OwnerPayouts = lazy(() => import('@/pages/OwnerPayouts'))
 const RateManagement = lazy(() => import('@/pages/RateManagement'))
+const MessageThread = lazy(() => import('@/pages/MessageThread'))
 
 const AppLayout = () => {
   const location = useLocation()
@@ -121,6 +122,7 @@ const router = createBrowserRouter([
       { path: '/payout-detail', element: <PayoutDetail /> },
       { path: '/owner-payouts', element: <OwnerPayouts /> },
       { path: '/rate-management', element: <RateManagement /> },
+      { path: '/messages', element: <MessageThread /> },
       { path: '*', element: <NoMatch /> }
     ]
   }

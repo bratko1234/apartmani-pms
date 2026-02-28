@@ -751,3 +751,27 @@ export interface RevenueTrendPoint {
   other: number
   total: number
 }
+
+//
+// Messaging types
+//
+export type MessageSender = 'guest' | 'owner' | 'system'
+
+export interface Message {
+  _id?: string
+  booking: string | Booking
+  property: string | Property
+  sender: MessageSender
+  senderName: string
+  content: string
+  source: BookingSource
+  channexMessageId?: string
+  readByOwner: boolean
+  readByAdmin: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface MessageUnreadCount {
+  total: number
+}
