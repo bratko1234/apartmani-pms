@@ -5,7 +5,6 @@ import {
   FormControl,
   FormHelperText,
   Button,
-  Paper,
   Checkbox,
   Link,
   FormControlLabel,
@@ -13,11 +12,6 @@ import {
   Radio,
   CircularProgress
 } from '@mui/material'
-import {
-  Home as PropertyIcon,
-  Person as RenterIcon,
-  Settings as PaymentOptionsIcon
-} from '@mui/icons-material'
 import validator from 'validator'
 import { format, intervalToDuration } from 'date-fns'
 import { fr, enUS } from 'date-fns/locale'
@@ -41,7 +35,6 @@ import * as PaymentService from '@/services/PaymentService'
 import * as StripeService from '@/services/StripeService'
 import * as PayPalService from '@/services/PayPalService'
 import { useRecaptchaContext, RecaptchaContextType } from '@/context/RecaptchaContext'
-import PropertyList from '@/components/PropertyList'
 import Layout from '@/components/Layout'
 import Error from '@/components/Error'
 import DatePicker from '@/components/DatePicker'
@@ -49,20 +42,21 @@ import NoMatch from './NoMatch'
 import SocialLogin from '@/components/SocialLogin'
 import CheckoutOptions from '@/components/CheckoutOptions'
 import Footer from '@/components/Footer'
-import Map from '@/components/Map'
-import ViewOnMapButton from '@/components/ViewOnMapButton'
-import MapDialog from '@/components/MapDialog'
 import CheckoutStatus from '@/components/CheckoutStatus'
+import BookingSummary from '@/components/BookingSummary'
+import TrustBadges from '@/components/TrustBadges'
 import Backdrop from '@/components/SimpleBackdrop'
 import Unauthorized from '@/components/Unauthorized'
 
 import '@/assets/css/checkout.css'
 
 //
-// Make sure to call `loadStripe` outside of a component’s render to avoid
+// Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
 //
-const stripePromise = env.PAYMENT_GATEWAY === movininTypes.PaymentGateway.Stripe ? loadStripe(env.STRIPE_PUBLISHABLE_KEY) : null
+const stripePromise = env.PAYMENT_GATEWAY === movininTypes.PaymentGateway.Stripe && env.STRIPE_PUBLISHABLE_KEY.startsWith('pk_')
+  ? loadStripe(env.STRIPE_PUBLISHABLE_KEY)
+  : null
 
 const Checkout = () => {
   const reactLocation = useLocation()
@@ -102,7 +96,6 @@ const Checkout = () => {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [bookingId, setBookingId] = useState<string>()
   const [sessionId, setSessionId] = useState<string>()
-  const [openMapDialog, setOpenMapDialog] = useState(false)
   const [payPalLoaded, setPayPalLoaded] = useState(false)
   const [payPalInit, setPayPalInit] = useState(false)
   const [payPalProcessing, setPayPalProcessing] = useState(false)
@@ -110,7 +103,6 @@ const Checkout = () => {
   const _fr = language === 'fr'
   const _locale = _fr ? fr : enUS
   const _format = _fr ? 'eee d LLL yyyy kk:mm' : 'eee, d LLL yyyy, p'
-  const bookingDetailHeight = env.AGENCY_IMAGE_HEIGHT + 10
   const days = movininHelper.days(from, to)
   const daysLabel = from && to && `${helper.getDaysShort(days)} (${movininHelper.capitalize(format(from, _format, { locale: _locale }),)} - ${movininHelper.capitalize(format(to, _format, { locale: _locale }))})`
 
@@ -371,16 +363,14 @@ const Checkout = () => {
       return
     }
 
-    let _property: movininTypes.Property | null = null
-    let _location: movininTypes.Location | null = null
     try {
-      _property = await PropertyService.getProperty(propertyId)
+      const _property = await PropertyService.getProperty(propertyId)
       if (!_property) {
         setNoMatch(true)
         return
       }
 
-      _location = await LocationService.getLocation(locationId)
+      const _location = await LocationService.getLocation(locationId)
 
       if (!_location) {
         setNoMatch(true)
@@ -403,315 +393,270 @@ const Checkout = () => {
     }
   }
 
+  const formatDate = (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }
+    return date.toLocaleDateString(language === 'sr' ? 'sr-Latn' : language, options)
+  }
+
   return (
     <Layout onLoad={onLoad} strict={false}>
       {!user?.blacklisted && visible && property && from && to && location && (
         <>
           <div className="checkout">
-            <Paper className="checkout-form" elevation={10}>
-              <h1 className="checkout-form-title">
-                {' '}
-                {strings.BOOKING_HEADING}
-                {' '}
-              </h1>
-              <form onSubmit={handleSubmit}>
-                <div>
+            {/* Left column — checkout form */}
+            <div className="checkout-main">
+              <h1 className="checkout-title">{strings.CONFIRM_AND_PAY}</h1>
 
-                  {(location.latitude && location.longitude) && (
-                    <Map
-                      position={[location.latitude || env.MAP_LATITUDE, location.longitude || env.MAP_LONGITUDE]}
-                      initialZoom={location.latitude && location.longitude ? 10 : 2.5}
-                      locations={[location]}
-                      className="map"
-                    >
-                      <ViewOnMapButton onClick={() => setOpenMapDialog(true)} />
-                    </Map>
-                  )}
-
-                  <PropertyList
-                    properties={[property]}
-                    hideActions
-                    hidePrice
-                    sizeAuto
-                    hideAgency={env.HIDE_AGENCIES}
-                  />
-
-                  <CheckoutOptions
-                    property={property}
-                    from={from}
-                    to={to}
-                    language={language}
-                    clientSecret={clientSecret}
-                    payPalLoaded={payPalLoaded}
-                    onPriceChange={(value) => setPrice(value)}
-                    onCancellationChange={(value) => setCancellation(value)}
-                  />
-
-                  <div className="checkout-details-container">
-                    <div className="checkout-info">
-                      <PropertyIcon />
-                      <span>{strings.BOOKING_DETAILS}</span>
-                    </div>
-                    <div className="checkout-details">
-                      <div className="checkout-detail" style={{ height: bookingDetailHeight }}>
-                        <span className="checkout-detail-title">{strings.DAYS}</span>
-                        <div className="checkout-detail-value">
-                          {daysLabel}
-                        </div>
-                      </div>
-                      <div className="checkout-detail" style={{ height: bookingDetailHeight }}>
-                        <span className="checkout-detail-title">{commonStrings.LOCATION}</span>
-                        <div className="checkout-detail-value">{location.name}</div>
-                      </div>
-
-                      <div className="checkout-detail" style={{ height: bookingDetailHeight }}>
-                        <span className="checkout-detail-title">{strings.PROPERTY}</span>
-                        <div className="checkout-detail-value">{`${property.name} (${helper.priceLabel(property, language)})`}</div>
-                      </div>
-                      {!env.HIDE_AGENCIES && (
-                        <div className="checkout-detail" style={{ height: bookingDetailHeight }}>
-                          <span className="checkout-detail-title">{commonStrings.AGENCY}</span>
-                          <div className="checkout-detail-value">
-                            <div className="property-agency">
-                              <img src={movininHelper.joinURL(env.CDN_USERS, property.agency.avatar)} alt={property.agency.fullName} style={{ height: env.AGENCY_IMAGE_HEIGHT }} />
-                              <span className="property-agency-name">{property.agency.fullName}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      <div className="checkout-detail" style={{ height: bookingDetailHeight }}>
-                        <span className="checkout-detail-title">{strings.COST}</span>
-                        <div className="checkout-detail-value checkout-price">{movininHelper.formatPrice(price, commonStrings.CURRENCY, language)}</div>
-                      </div>
-                    </div>
-                  </div>
-                  {!authenticated && (
-                    <div className="renter-details">
-                      <div className="checkout-info">
-                        <RenterIcon />
-                        <span>{strings.RENTER_DETAILS}</span>
-                      </div>
-                      <div className="renter-details-form">
-                        <FormControl fullWidth margin="dense">
-                          <InputLabel className="required">{commonStrings.FULL_NAME}</InputLabel>
-                          <OutlinedInput type="text" label={commonStrings.FULL_NAME} required onChange={handleFullNameChange} autoComplete="off" />
-                        </FormControl>
-                        <FormControl fullWidth margin="dense">
-                          <InputLabel className="required">{commonStrings.EMAIL}</InputLabel>
-                          <OutlinedInput
-                            type="text"
-                            label={commonStrings.EMAIL}
-                            error={!emailValid || emailRegitered}
-                            onBlur={handleEmailBlur}
-                            onChange={handleEmailChange}
-                            required
-                            autoComplete="off"
-                          />
-                          <FormHelperText error={!emailValid || emailRegitered}>
-                            {(!emailValid && commonStrings.EMAIL_NOT_VALID) || ''}
-                            {(emailRegitered && (
-                              <span>
-                                <span>{commonStrings.EMAIL_ALREADY_REGISTERED}</span>
-                                <span> </span>
-                                <a href={`/sign-in?p=${property._id}&l=${location._id}&f=${from.getTime()}&t=${to.getTime()}&from=checkout`}>{strings.SIGN_IN}</a>
-                              </span>
-                            ))
-                              || ''}
-                            {(emailInfo && strings.EMAIL_INFO) || ''}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl fullWidth margin="dense">
-                          <InputLabel className="required">{commonStrings.PHONE}</InputLabel>
-                          <OutlinedInput type="text" label={commonStrings.PHONE} error={!phoneValid} onBlur={handlePhoneBlur} onChange={handlePhoneChange} required autoComplete="off" />
-                          <FormHelperText error={!phoneValid}>
-                            {(!phoneValid && commonStrings.PHONE_NOT_VALID) || ''}
-                            {(phoneInfo && strings.PHONE_INFO) || ''}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl fullWidth margin="dense">
-                          <DatePicker
-                            label={commonStrings.BIRTH_DATE}
-                            variant="outlined"
-                            required
-                            onChange={(_birthDate) => {
-                              if (_birthDate) {
-                                const _birthDateValid = validateBirthDate(_birthDate)
-
-                                setBirthDate(_birthDate)
-                                setBirthDateValid(_birthDateValid)
-                              }
-                            }}
-                            language={language}
-                          />
-                          <FormHelperText error={!birthDateValid}>{(!birthDateValid && helper.getBirthDateError(property.minimumAge)) || ''}</FormHelperText>
-                        </FormControl>
-
-                        <div className="checkout-tos">
-                          <table>
-                            <tbody>
-                              <tr>
-                                <td aria-label="tos">
-                                  <Checkbox checked={tosChecked} onChange={handleTosChange} color="primary" />
-                                </td>
-                                <td>
-                                  <Link href="/tos" target="_blank" rel="noreferrer">
-                                    {commonStrings.TOS}
-                                  </Link>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <SocialLogin reloadPage />
-                      </div>
-                    </div>
-                  )}
-
-                  {property.agency.payLater && (
-                    <div className="payment-options-container">
-                      <div className="checkout-info">
-                        <PaymentOptionsIcon />
-                        <span>{strings.PAYMENT_OPTIONS}</span>
-                      </div>
-                      <div className="payment-options">
-                        <FormControl>
-                          <RadioGroup
-                            defaultValue="payOnline"
-                            onChange={(event) => {
-                              setPayLater(event.target.value === 'payLater')
-                            }}
-                          >
-                            <FormControlLabel
-                              value="payLater"
-                              control={<Radio />}
-                              disabled={!!clientSecret || payPalLoaded}
-                              className={clientSecret || payPalLoaded ? 'payment-radio-disabled' : ''}
-                              label={(
-                                <span className="payment-button">
-                                  <span>{strings.PAY_LATER}</span>
-                                  <span className="payment-info">{`(${strings.PAY_LATER_INFO})`}</span>
-                                </span>
-                              )}
-                            />
-                            <FormControlLabel
-                              value="payOnline"
-                              control={<Radio />}
-                              disabled={!!clientSecret || payPalLoaded}
-                              className={clientSecret || payPalLoaded ? 'payment-radio-disabled' : ''}
-                              label={(
-                                <span className="payment-button">
-                                  <span>{strings.PAY_ONLINE}</span>
-                                  <span className="payment-info">{`(${strings.PAY_ONLINE_INFO})`}</span>
-                                </span>
-                              )}
-                            />
-                          </RadioGroup>
-                        </FormControl>
-                      </div>
-                    </div>
-                  )}
-
-                  {(!property.agency.payLater || !payLater) && (
-                    env.PAYMENT_GATEWAY === movininTypes.PaymentGateway.Stripe
-                      ? (clientSecret && (
-                        <div className="payment-options-container">
-
-                          <EmbeddedCheckoutProvider
-                            stripe={stripePromise}
-                            options={{ clientSecret }}
-                          >
-                            <EmbeddedCheckout />
-                          </EmbeddedCheckoutProvider>
-                        </div>
-                      )
-                      )
-                      : payPalLoaded ? (
-                        <div className="payment-options-container">
-                          <PayPalButtons
-                            createOrder={async () => {
-                              const name = movininHelper.truncateString(property.name, PayPalService.ORDER_NAME_MAX_LENGTH)
-                              const _description = `${property.name} - ${daysLabel} - ${location.name}`
-                              const description = movininHelper.truncateString(_description, PayPalService.ORDER_DESCRIPTION_MAX_LENGTH)
-                              const orderId = await PayPalService.createOrder(bookingId!, price, PaymentService.getCurrency(), name, description)
-                              return orderId
-                            }}
-                            onApprove={async (data, actions) => {
-                              try {
-                                setPayPalProcessing(true)
-                                await actions.order?.capture()
-                                const { orderID } = data
-                                const status = await PayPalService.checkOrder(bookingId!, orderID)
-
-                                if (status === 200) {
-                                  setVisible(false)
-                                  setSuccess(true)
-                                } else {
-                                  setPaymentFailed(true)
-                                }
-                              } catch (err) {
-                                helper.error(err)
-                              } finally {
-                                setPayPalProcessing(false)
-                              }
-                            }}
-                            onInit={() => {
-                              setPayPalInit(true)
-                            }}
-                            onCancel={() => {
-                              setPayPalProcessing(false)
-                            }}
-                            onError={() => {
-                              setPayPalProcessing(false)
-                            }}
-                          />
-                        </div>
-                      ) : null
-                  )}
-                  <div className="checkout-buttons">
-                    {(
-                      (env.PAYMENT_GATEWAY === movininTypes.PaymentGateway.Stripe && !clientSecret)
-                      || (env.PAYMENT_GATEWAY === movininTypes.PaymentGateway.PayPal && !payPalInit)
-                      || payLater) && (
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          className="btn-checkout btn-margin-bottom"
-                          size="small"
-                          disabled={loading || (payPalLoaded && !payPalInit)}
-                        >
-                          {
-                            (loading || (payPalLoaded && !payPalInit))
-                              ? <CircularProgress color="inherit" size={24} />
-                              : strings.BOOK
-                          }
-                        </Button>
-                      )}
-                    <Button
-                      variant="outlined"
-                      className="btn-cancel btn-margin-bottom"
-                      size="small"
-                      onClick={async () => {
-                        try {
-                          if (bookingId && sessionId) {
-                            //
-                            // Delete temporary booking on cancel.
-                            // Otherwise, temporary bookings are
-                            // automatically deleted through a TTL index.
-                            //
-                            await BookingService.deleteTempBooking(bookingId, sessionId)
-                          }
-                        } catch (err) {
-                          helper.error(err)
-                        } finally {
-                          navigate('/')
-                        }
-                      }}
-                    >
-                      {commonStrings.CANCEL}
-                    </Button>
+              {/* Your trip section */}
+              <div className="checkout-section">
+                <h2 className="checkout-section-title">{strings.YOUR_TRIP}</h2>
+                <div className="checkout-trip-detail">
+                  <div className="checkout-trip-detail-content">
+                    <span className="checkout-trip-label">{strings.DATES_LABEL}</span>
+                    <span className="checkout-trip-value">{`${formatDate(from)} — ${formatDate(to)}`}</span>
                   </div>
                 </div>
+              </div>
+
+              <form onSubmit={handleSubmit}>
+                {/* Checkout options (cancellation toggle) */}
+                <CheckoutOptions
+                  property={property}
+                  from={from}
+                  to={to}
+                  language={language}
+                  clientSecret={clientSecret}
+                  payPalLoaded={payPalLoaded}
+                  onPriceChange={(value) => setPrice(value)}
+                  onCancellationChange={(value) => setCancellation(value)}
+                />
+
+                {/* Payment options (pay later / pay online) */}
+                {property.agency.payLater && (
+                  <div className="checkout-section">
+                    <h2 className="checkout-section-title">{strings.PAYMENT_OPTIONS}</h2>
+                    <div className="checkout-payment-options">
+                      <FormControl>
+                        <RadioGroup
+                          defaultValue="payOnline"
+                          onChange={(event) => {
+                            setPayLater(event.target.value === 'payLater')
+                          }}
+                        >
+                          <FormControlLabel
+                            value="payLater"
+                            control={<Radio />}
+                            disabled={!!clientSecret || payPalLoaded}
+                            className={clientSecret || payPalLoaded ? 'payment-radio-disabled' : ''}
+                            label={(
+                              <span className="payment-button">
+                                <span>{strings.PAY_LATER}</span>
+                                <span className="payment-info">{`(${strings.PAY_LATER_INFO})`}</span>
+                              </span>
+                            )}
+                          />
+                          <FormControlLabel
+                            value="payOnline"
+                            control={<Radio />}
+                            disabled={!!clientSecret || payPalLoaded}
+                            className={clientSecret || payPalLoaded ? 'payment-radio-disabled' : ''}
+                            label={(
+                              <span className="payment-button">
+                                <span>{strings.PAY_ONLINE}</span>
+                                <span className="payment-info">{`(${strings.PAY_ONLINE_INFO})`}</span>
+                              </span>
+                            )}
+                          />
+                        </RadioGroup>
+                      </FormControl>
+                    </div>
+                  </div>
+                )}
+
+                {/* Guest details (if not authenticated) */}
+                {!authenticated && (
+                  <div className="checkout-section">
+                    <h2 className="checkout-section-title">{strings.RENTER_DETAILS}</h2>
+                    <div className="checkout-guest-form">
+                      <FormControl fullWidth margin="dense">
+                        <InputLabel className="required">{commonStrings.FULL_NAME}</InputLabel>
+                        <OutlinedInput type="text" label={commonStrings.FULL_NAME} required onChange={handleFullNameChange} autoComplete="off" />
+                      </FormControl>
+                      <FormControl fullWidth margin="dense">
+                        <InputLabel className="required">{commonStrings.EMAIL}</InputLabel>
+                        <OutlinedInput
+                          type="text"
+                          label={commonStrings.EMAIL}
+                          error={!emailValid || emailRegitered}
+                          onBlur={handleEmailBlur}
+                          onChange={handleEmailChange}
+                          required
+                          autoComplete="off"
+                        />
+                        <FormHelperText error={!emailValid || emailRegitered}>
+                          {(!emailValid && commonStrings.EMAIL_NOT_VALID) || ''}
+                          {(emailRegitered && (
+                            <span>
+                              <span>{commonStrings.EMAIL_ALREADY_REGISTERED}</span>
+                              <span> </span>
+                              <a href={`/sign-in?p=${property._id}&l=${location._id}&f=${from.getTime()}&t=${to.getTime()}&from=checkout`}>{strings.SIGN_IN}</a>
+                            </span>
+                          ))
+                            || ''}
+                          {(emailInfo && strings.EMAIL_INFO) || ''}
+                        </FormHelperText>
+                      </FormControl>
+                      <FormControl fullWidth margin="dense">
+                        <InputLabel className="required">{commonStrings.PHONE}</InputLabel>
+                        <OutlinedInput type="text" label={commonStrings.PHONE} error={!phoneValid} onBlur={handlePhoneBlur} onChange={handlePhoneChange} required autoComplete="off" />
+                        <FormHelperText error={!phoneValid}>
+                          {(!phoneValid && commonStrings.PHONE_NOT_VALID) || ''}
+                          {(phoneInfo && strings.PHONE_INFO) || ''}
+                        </FormHelperText>
+                      </FormControl>
+                      <FormControl fullWidth margin="dense">
+                        <DatePicker
+                          label={commonStrings.BIRTH_DATE}
+                          variant="outlined"
+                          required
+                          onChange={(_birthDate) => {
+                            if (_birthDate) {
+                              const _birthDateValid = validateBirthDate(_birthDate)
+
+                              setBirthDate(_birthDate)
+                              setBirthDateValid(_birthDateValid)
+                            }
+                          }}
+                          language={language}
+                        />
+                        <FormHelperText error={!birthDateValid}>{(!birthDateValid && helper.getBirthDateError(property.minimumAge)) || ''}</FormHelperText>
+                      </FormControl>
+
+                      <div className="checkout-tos">
+                        <table>
+                          <tbody>
+                            <tr>
+                              <td aria-label="tos">
+                                <Checkbox checked={tosChecked} onChange={handleTosChange} color="primary" />
+                              </td>
+                              <td>
+                                <Link href="/tos" target="_blank" rel="noreferrer">
+                                  {commonStrings.TOS}
+                                </Link>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <SocialLogin reloadPage />
+                    </div>
+                  </div>
+                )}
+
+                {/* Stripe / PayPal embedded payment */}
+                {(!property.agency.payLater || !payLater) && (
+                  env.PAYMENT_GATEWAY === movininTypes.PaymentGateway.Stripe
+                    ? (clientSecret && (
+                      <div className="checkout-section">
+                        <EmbeddedCheckoutProvider
+                          stripe={stripePromise}
+                          options={{ clientSecret }}
+                        >
+                          <EmbeddedCheckout />
+                        </EmbeddedCheckoutProvider>
+                      </div>
+                    )
+                    )
+                    : payPalLoaded ? (
+                      <div className="checkout-section">
+                        <PayPalButtons
+                          createOrder={async () => {
+                            const name = movininHelper.truncateString(property.name, PayPalService.ORDER_NAME_MAX_LENGTH)
+                            const _description = `${property.name} - ${daysLabel} - ${location.name}`
+                            const description = movininHelper.truncateString(_description, PayPalService.ORDER_DESCRIPTION_MAX_LENGTH)
+                            const orderId = await PayPalService.createOrder(bookingId!, price, PaymentService.getCurrency(), name, description)
+                            return orderId
+                          }}
+                          onApprove={async (data, actions) => {
+                            try {
+                              setPayPalProcessing(true)
+                              await actions.order?.capture()
+                              const { orderID } = data
+                              const status = await PayPalService.checkOrder(bookingId!, orderID)
+
+                              if (status === 200) {
+                                setVisible(false)
+                                setSuccess(true)
+                              } else {
+                                setPaymentFailed(true)
+                              }
+                            } catch (err) {
+                              helper.error(err)
+                            } finally {
+                              setPayPalProcessing(false)
+                            }
+                          }}
+                          onInit={() => {
+                            setPayPalInit(true)
+                          }}
+                          onCancel={() => {
+                            setPayPalProcessing(false)
+                          }}
+                          onError={() => {
+                            setPayPalProcessing(false)
+                          }}
+                        />
+                      </div>
+                    ) : null
+                )}
+
+                {/* Action buttons */}
+                <div className="checkout-buttons">
+                  {(
+                    (env.PAYMENT_GATEWAY === movininTypes.PaymentGateway.Stripe && !clientSecret)
+                    || (env.PAYMENT_GATEWAY === movininTypes.PaymentGateway.PayPal && !payPalInit)
+                    || payLater) && (
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        className="btn-checkout"
+                        size="small"
+                        fullWidth
+                        disabled={loading || (payPalLoaded && !payPalInit)}
+                      >
+                        {
+                          (loading || (payPalLoaded && !payPalInit))
+                            ? <CircularProgress color="inherit" size={24} />
+                            : strings.CONFIRM_AND_PAY
+                        }
+                      </Button>
+                    )}
+                  <Button
+                    variant="outlined"
+                    className="btn-cancel"
+                    size="small"
+                    fullWidth
+                    onClick={async () => {
+                      try {
+                        if (bookingId && sessionId) {
+                          await BookingService.deleteTempBooking(bookingId, sessionId)
+                        }
+                      } catch (err) {
+                        helper.error(err)
+                      } finally {
+                        navigate('/')
+                      }
+                    }}
+                  >
+                    {commonStrings.CANCEL}
+                  </Button>
+                </div>
+
                 <div className="form-error">
                   {tosError && <Error message={commonStrings.TOS_ERROR} />}
                   {error && <Error message={commonStrings.GENERIC_ERROR} />}
@@ -719,7 +664,19 @@ const Checkout = () => {
                   {recaptchaError && <Error message={commonStrings.RECAPTCHA_ERROR} />}
                 </div>
               </form>
-            </Paper>
+            </div>
+
+            {/* Right column — sticky summary */}
+            <div className="checkout-sidebar">
+              <BookingSummary
+                property={property}
+                from={from}
+                to={to}
+                language={language}
+                hideBookButton
+              />
+              <TrustBadges />
+            </div>
           </div>
 
           <Footer />
@@ -741,12 +698,6 @@ const Checkout = () => {
       )}
 
       {payPalProcessing && <Backdrop text={strings.CHECKING} />}
-
-      <MapDialog
-        location={location}
-        openMapDialog={openMapDialog}
-        onClose={() => setOpenMapDialog(false)}
-      />
     </Layout>
   )
 }

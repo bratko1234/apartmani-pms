@@ -84,7 +84,7 @@ const CreateBooking = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!property || !from || !to || !status) {
+    if (!agency || !renter || !property || !location || !from || !to || !status) {
       helper.error()
       return
     }

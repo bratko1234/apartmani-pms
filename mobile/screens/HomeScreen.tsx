@@ -111,7 +111,7 @@ const HomeScreen = ({ navigation, route }: NativeStackScreenProps<StackParams, '
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
           <View style={styles.contentContainer}>
             <View style={styles.logo}>
-              <Text style={styles.logoMain}>Movin&apos; In</Text>
+              <Text style={styles.logoMain}>Apartmani</Text>
               <Text style={styles.logoRegistered}>®</Text>
             </View>
 

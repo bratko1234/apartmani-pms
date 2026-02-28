@@ -9,6 +9,7 @@ const routes = {
   getProperties: '/api/properties/:page/:size',
   getBookingProperties: '/api/booking-properties/:page/:size',
   getFrontendProperties: '/api/frontend-properties/:page/:size',
+  getFeaturedProperties: '/api/featured-properties/:page/:size/:language',
   checkProperty: '/api/check-property/:id',
 }
 

@@ -1031,3 +1031,114 @@ export const getFrontendProperties = async (req: Request, res: Response) => {
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
+
+/**
+ * Get featured properties for homepage (no filters required).
+ *
+ * @export
+ * @async
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {unknown}
+ */
+export const getFeaturedProperties = async (req: Request, res: Response) => {
+  try {
+    const page = Number.parseInt(req.params.page, 10)
+    const size = Number.parseInt(req.params.size, 10)
+    const language = String(req.params.language || env.DEFAULT_LANGUAGE)
+    const locationId = req.query.location ? String(req.query.location) : undefined
+
+    const $match: mongoose.QueryFilter<movininTypes.Property> = {
+      available: true,
+      hidden: false,
+    }
+
+    if (locationId) {
+      const locIds = await Location.find({
+        $or: [
+          { _id: new mongoose.Types.ObjectId(locationId) },
+          { parentLocation: new mongoose.Types.ObjectId(locationId) },
+        ],
+      }).select('_id').lean()
+      $match.location = { $in: locIds.map((loc) => loc._id) }
+    }
+
+    const data = await Property.aggregate(
+      [
+        { $match },
+        {
+          $lookup: {
+            from: 'User',
+            let: { userId: '$agency' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$_id', '$$userId'] },
+                },
+              },
+            ],
+            as: 'agency',
+          },
+        },
+        { $unwind: { path: '$agency', preserveNullAndEmptyArrays: false } },
+        {
+          $lookup: {
+            from: 'Location',
+            let: { locationId: '$location' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$_id', '$$locationId'] },
+                },
+              },
+              {
+                $lookup: {
+                  from: 'LocationValue',
+                  let: { values: '$values' },
+                  pipeline: [
+                    {
+                      $match: {
+                        $and: [
+                          { $expr: { $in: ['$_id', '$$values'] } },
+                          { $expr: { $eq: ['$language', language] } },
+                        ],
+                      },
+                    },
+                  ],
+                  as: 'value',
+                },
+              },
+              { $unwind: { path: '$value', preserveNullAndEmptyArrays: true } },
+              {
+                $addFields: { name: { $ifNull: ['$value.value', '$name'] } },
+              },
+            ],
+            as: 'location',
+          },
+        },
+        { $unwind: { path: '$location', preserveNullAndEmptyArrays: false } },
+        {
+          $facet: {
+            resultData: [{ $sort: { updatedAt: -1, _id: 1 } }, { $skip: (page - 1) * size }, { $limit: size }],
+            pageInfo: [
+              {
+                $count: 'totalRecords',
+              },
+            ],
+          },
+        },
+      ],
+      { collation: { locale: env.DEFAULT_LANGUAGE, strength: 2 } },
+    )
+
+    for (const property of data[0].resultData) {
+      const { _id, fullName, avatar } = property.agency
+      property.agency = { _id, fullName, avatar }
+    }
+
+    res.json(data)
+  } catch (err) {
+    logger.error(`[property.getFeaturedProperties] ${i18n.t('ERROR')}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
+  }
+}

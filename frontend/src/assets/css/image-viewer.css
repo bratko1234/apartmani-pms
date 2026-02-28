@@ -8,7 +8,7 @@
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgb(0 0 0 / 50%);
+  background-color: rgb(0 0 0 / 70%);
   box-sizing: border-box;
 }
 
@@ -16,8 +16,9 @@
   width: 90%;
   height: 90%;
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   position: absolute;
+  overflow: hidden;
 }
 
 .iv-content {
@@ -42,62 +43,81 @@
   width: auto;
   height: auto;
   user-select: none;
+  border-radius: var(--radius-md);
+  transition: opacity var(--transition-base);
 }
 
 .close {
-  color: black;
+  color: var(--color-text-secondary);
   position: absolute;
-  top: 0;
-  right: 15px;
-  font-size: 35px;
+  top: var(--space-3);
+  right: var(--space-4);
+  font-size: 32px;
   font-weight: 400;
-  opacity: .6;
   cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  z-index: 10;
+}
+
+.close:hover {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
 }
 
 .img-title {
   position: absolute;
-  top: 15px;
-  left: 15px;
-  font-size: 18px;
-  font-weight: 500;
-}
-
-.close:hover {
-  opacity: 1;
+  top: var(--space-4);
+  left: var(--space-5);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
 .navigation {
-  color: black;
+  color: var(--color-text-primary);
   cursor: pointer;
   position: absolute;
   top: calc(50% - 60px);
-  font-size: 50px;
-  line-height: 60px;
-  font-weight: 300;
+  font-size: 24px;
+  line-height: 48px;
+  font-weight: 400;
   display: flex;
   align-items: center;
-  opacity: .6;
-  padding: 0 15px;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-md);
   user-select: none;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  padding: 0;
 }
 
 .navigation:hover {
-  opacity: 1;
+  background: #FFFFFF;
+  transform: scale(1.05);
 }
 
 @media (hover: none) {
   .navigation:hover {
-    opacity: 0.2;
+    background: rgba(255, 255, 255, 0.9);
+    transform: none;
   }
 }
 
 .prev {
-  left: 0;
+  left: var(--space-4);
 }
 
 .next {
-  right: 0;
+  right: var(--space-4);
 }
 
 @media (width <= 900px) {
@@ -113,6 +133,7 @@ div.thumbnails-container {
   left: 0;
   height: 100px;
   overflow-x: auto;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.03));
 }
 
 div.thumbnails {
@@ -121,32 +142,38 @@ div.thumbnails {
   align-items: center;
   justify-content: center;
   position: absolute;
-  padding: 0 15px;
+  padding: 0 var(--space-4);
+  gap: var(--space-2);
 }
 
 div.thumbnails div.thumbnail {
-  width: 60px;
-  height: 60px;
-  border: 2px solid #D5DBDB;
-  margin-right: 10px;
-  padding: 5px;
+  width: 64px;
+  height: 64px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  overflow: hidden;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: border-color var(--transition-fast), opacity var(--transition-fast);
+  opacity: 0.7;
 }
 
 div.thumbnails div.thumbnail:hover {
-  border: 2px solid #004b91;
+  opacity: 1;
+  border-color: var(--color-text-muted);
 }
 
 div.thumbnails div.selected,
 div.thumbnails div.selected:hover {
-  border: 2px solid #FF8F00;
+  border-color: var(--color-text-primary);
+  opacity: 1;
 }
 
 div.thumbnails img.thumbnail {
   max-width: 100%;
   max-height: 100%;
+  object-fit: cover;
 }

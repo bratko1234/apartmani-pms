@@ -1,31 +1,37 @@
+/* Airbnb-style Footer */
+
 div.footer {
   width: 100%;
-  min-height: 300px;
   flex-shrink: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: #f2f2f2;
-  color: #1a1a1a;
-  border-top: 1px solid #ebebeb;
-  font-size: 12px;
-  padding: 12px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  padding: var(--space-12) var(--space-6);
+  border-top: 1px solid var(--color-border);
   transform: translate3d(0, 0, 0);
 }
 
 div.footer div.header {
-  text-decoration: none;
-  font-size: 18px;
-  font-weight: 500;
-  color: #121212;
+  margin-bottom: var(--space-8);
+}
+
+div.footer div.header .footer-logo {
+  height: 56px;
+  width: auto;
+  display: block;
 }
 
 div.footer section.main {
   width: 100%;
   display: flex;
   flex-direction: row;
-  margin-bottom: 15px;
-  padding-bottom: 80px;
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-8);
+  gap: var(--space-8);
+  border-bottom: 1px solid var(--color-border);
 }
 
 div.footer div.main-section {
@@ -34,9 +40,10 @@ div.footer div.main-section {
 
 div.footer div.main-section div.title {
   text-align: left;
-  margin-bottom: 10px;
-  color: #1a1a1a;
-  font-weight: bold;
+  margin-bottom: var(--space-4);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  font-size: var(--font-size-base);
 }
 
 div.footer ul.links {
@@ -47,47 +54,54 @@ div.footer ul.links {
 div.footer ul.links li {
   list-style: none;
   cursor: pointer;
-  margin: 10px 0;
+  margin: var(--space-3) 0;
   width: fit-content;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  transition: color var(--transition-fast);
 }
 
 div.footer ul.links li:hover {
   text-decoration: underline;
+  color: var(--color-text-primary);
 }
 
 div.footer div.footer-contact {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 10px 0;
+  margin: var(--space-3) 0;
 }
 
 div.footer div.footer-contact .icon {
-  color: #525252;
-  margin-right: 5px;
+  color: var(--color-text-secondary);
+  margin-right: var(--space-2);
+  width: 18px;
+  height: 18px;
 }
 
 div.footer div.footer-contact a {
   text-decoration: none;
-  color: #1a1a1a;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
 }
 
 div.footer div.footer-contact a:hover {
-  /* opacity: 0.85; */
   text-decoration: underline;
+  color: var(--color-text-primary);
 }
 
 div.footer div.footer-contact .social-icon {
-  color: #525252;
-  /* margin-right: 12px; */
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
 }
 
 div.footer div.footer-contact .social-icon:hover {
-  color: #1a1a1a;
+  color: var(--color-text-primary);
 }
 
 div.footer div.newsletter {
-  margin-top: 80px;
+  margin-top: var(--space-8);
 }
 
 div.footer section.payment {
@@ -95,9 +109,10 @@ div.footer section.payment {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  border-top: 1px solid #dbdbdb;
-  border-bottom: 1px solid #dbdbdb;
-  padding: 10px 0;
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) 0;
 }
 
 div.footer section.payment div.payment-text {
@@ -105,25 +120,39 @@ div.footer section.payment div.payment-text {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
-@media only screen and (width <=960px) {
+div.footer section.copyright {
+  width: 100%;
+  padding: var(--space-6) 0 var(--space-4);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+@media only screen and (width <= 960px) {
   div.footer section.main {
     flex-direction: column;
+    gap: var(--space-6);
   }
 
   div.footer div.main-section {
-    margin: 10px;
+    margin: 0;
   }
 
   div.footer section.payment {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
   }
 
   div.footer section.payment div.payment-text {
     margin: 5px 0;
-    padding-left: 8px;
+    padding-left: 0;
     align-items: flex-start;
   }
 
@@ -132,16 +161,8 @@ div.footer section.payment div.payment-text {
   }
 }
 
-div.footer section.copyright {
-  width: 100%;
-  padding: 40px 0 15px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-@media only screen and (width >=960px) {
+@media only screen and (width >= 960px) {
   div.footer {
-    padding: 12px 10%;
+    padding: var(--space-12) 10%;
   }
 }

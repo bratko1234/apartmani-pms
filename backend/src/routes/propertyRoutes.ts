@@ -17,5 +17,6 @@ routes.route(routeNames.getProperty).get(propertyController.getProperty)
 routes.route(routeNames.getProperties).post(authJwt.verifyToken, authJwt.authAgency, propertyController.getProperties)
 routes.route(routeNames.getBookingProperties).post(authJwt.verifyToken, authJwt.authAgency, propertyController.getBookingProperties)
 routes.route(routeNames.getFrontendProperties).post(propertyController.getFrontendProperties)
+routes.route(routeNames.getFeaturedProperties).get(propertyController.getFeaturedProperties)
 
 export default routes

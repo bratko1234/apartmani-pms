@@ -1,245 +1,266 @@
+/* Airbnb-style Checkout Page */
+
 div.checkout {
   display: flex;
-  flex: 1 0 auto;
   flex-direction: row;
+  align-items: flex-start;
   justify-content: center;
-  transform: translate3d(0, 0, 0);
   min-height: 100vh;
-  margin: 80px 0 200px 0;
-}
-
-div.checkout .map {
-  min-height: 0;
-  height: 340px;
-}
-
-div.checkout .payment-radio-disabled>*,
-div.checkout .payment-radio-disabled span.payment-info {
-  color: #919191 !important;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6);
+  gap: var(--space-16);
 }
 
 .status {
   margin: 40px 0 0 30px;
 }
 
-@media only screen and (width <=960px) {
-  div.checkout {
-    flex: 0 1 auto;
-  }
+/* Left column — checkout form */
+
+div.checkout .checkout-main {
+  flex: 1;
+  max-width: 600px;
+  min-width: 0;
 }
 
-div.checkout .checkout-form-title {
-  text-align: center;
-  text-transform: capitalize;
-  color: #232323;
-  margin-bottom: 30px;
+div.checkout .checkout-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
 }
 
-div.checkout div.checkout-info {
+/* Sections */
+
+div.checkout .checkout-section {
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+div.checkout .checkout-section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4);
+}
+
+/* Trip details */
+
+div.checkout .checkout-trip-detail {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+div.checkout .checkout-trip-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+div.checkout .checkout-trip-label {
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+div.checkout .checkout-trip-value {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+/* Override checkout-options base styles to match the checkout layout */
+
+div.checkout .checkout-options-container {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+  width: 100% !important;
+}
+
+div.checkout .checkout-options-container .checkout-info {
+  display: none;
+}
+
+div.checkout .checkout-options-container .checkout-options {
+  color: var(--color-text-primary);
+}
+
+div.checkout .checkout-options-container .checkout-options span.checkout-option-label {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+div.checkout .checkout-options-container .checkout-options span.checkout-option-value {
+  color: var(--color-text-secondary);
+}
+
+/* Payment options */
+
+div.checkout .checkout-payment-options {
+  color: var(--color-text-primary);
+}
+
+div.checkout .payment-radio-disabled > *,
+div.checkout .payment-radio-disabled span.payment-info {
+  color: var(--color-text-muted) !important;
+}
+
+div.checkout span.payment-info {
+  margin-left: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Guest details form — full width within column */
+
+div.checkout .checkout-guest-form {
   width: 100%;
-  margin-bottom: 20px;
 }
 
-div.checkout div.checkout-info span {
-  color: #444;
-  display: inline-block;
-  font-size: 17px;
-  font-weight: 700;
-  margin-left: 5px;
+div.checkout .checkout-tos {
+  margin-top: var(--space-4);
 }
 
-div.checkout div.checkout-options-container,
-div.checkout div.checkout-details-container,
-div.checkout div.payment-options-container {
-  background: #fbfbfb;
-  border: 1px solid #d9d8d9;
-  border-radius: 5px;
-  padding: 25px;
-  margin-bottom: 15px;
+/* Action buttons — full width */
+
+div.checkout .checkout-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
-div.checkout div.checkout-options,
-div.checkout div.payment-options {
-  color: #333;
-  user-select: none;
+/* Confirm and pay CTA — Airbnb gradient */
+
+div.checkout .btn-checkout {
+  font-size: var(--font-size-lg) !important;
+  line-height: 24px;
+  font-weight: 500 !important;
+  border: 0;
+  border-radius: var(--radius-sm) !important;
+  color: #fff !important;
+  height: 48px;
+  margin: 0;
+  white-space: nowrap;
+  padding: var(--space-1) var(--space-8);
+  background: var(--gradient-cta) !important;
+  text-transform: none !important;
 }
 
-div.checkout div.payment-options span.payment-info {
-  margin-left: 10px;
-  color: rgb(0 0 0 / 55%);
-  font-size: 13px;
+div.checkout .btn-checkout:hover {
+  opacity: 0.9;
 }
 
-@media only screen and (width <=960px) {
-  div.checkout div.payment-options span.payment-button {
+div.checkout .btn-cancel {
+  font-size: var(--font-size-lg) !important;
+  line-height: 24px;
+  font-weight: 500 !important;
+  height: 48px;
+  border-radius: var(--radius-sm) !important;
+  text-transform: none !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Right column — sticky order summary */
+
+div.checkout .checkout-sidebar {
+  width: 380px;
+  min-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  position: sticky;
+  top: var(--space-6);
+  align-self: flex-start;
+}
+
+/* Trust badges override inside checkout sidebar — stack vertically */
+
+div.checkout .checkout-sidebar .trust-badges {
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  max-width: none;
+  margin: 0;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+div.checkout .checkout-sidebar .trust-badge {
+  gap: var(--space-3);
+}
+
+div.checkout .checkout-sidebar .trust-badge-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+}
+
+div.checkout .checkout-sidebar .trust-badge-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+div.checkout .checkout-sidebar .trust-badge-title {
+  font-size: var(--font-size-base);
+}
+
+div.checkout .checkout-sidebar .trust-badge-subtitle {
+  font-size: var(--font-size-sm);
+}
+
+/* Error block */
+
+div.checkout .form-error {
+  height: auto;
+  min-height: 0;
+  padding-top: var(--space-2);
+  text-align: left;
+}
+
+/* Mobile */
+
+@media only screen and (width <= 960px) {
+  div.checkout {
+    flex-direction: column;
+    padding: var(--space-4);
+    gap: var(--space-6);
+  }
+
+  div.checkout .checkout-main {
+    max-width: none;
+  }
+
+  div.checkout .checkout-sidebar {
+    width: 100%;
+    min-width: unset;
+    order: -1;
+    position: static;
+  }
+
+  div.checkout .checkout-sidebar .trust-badges {
+    flex-direction: row;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  div.checkout span.payment-button {
     display: flex;
     flex-direction: column;
   }
 
-  div.checkout div.payment-options span.payment-info {
+  div.checkout span.payment-info {
     margin-left: 0;
-  }
-}
-
-div.checkout div.checkout-options span.checkout-option-label {
-  font-weight: 700;
-}
-
-div.checkout div.checkout-options span.checkout-option-label::after {
-  content: ' ';
-}
-
-div.checkout div.checkout-options span.checkout-option-value {
-  color: rgb(0 0 0 / 55%);
-}
-
-div.checkout div.checkout-details {
-  display: table;
-  color: #333;
-  font-size: 15px;
-}
-
-div.checkout div.checkout-details div.checkout-detail {
-  display: table-row;
-}
-
-div.checkout div.checkout-details div.checkout-detail span.checkout-detail-title,
-div.checkout div.checkout-details div.checkout-detail div.checkout-detail-value {
-  display: table-cell;
-}
-
-div.checkout div.checkout-details div.checkout-detail div.checkout-detail-value {
-  color: rgb(0 0 0 / 55%);
-  word-break: break-word;
-}
-
-div.checkout div.checkout-details div.checkout-detail span.checkout-detail-title {
-  font-weight: 700;
-  width: 250px;
-}
-
-div.checkout div.checkout-details div.checkout-detail div.checkout-detail-value div.property-agency {
-  display: flex;
-  align-items: center;
-}
-
-div.checkout div.checkout-details div.checkout-detail div.checkout-detail-value span.property-agency-name {
-  color: rgb(0 0 0 / 60%);
-  font-size: 0.9em;
-  /* line-height: 1em; */
-  white-space: nowrap;
-  margin-left: 5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-word;
-  width: 200px;
-}
-
-div.checkout div.checkout-details div.checkout-detail div.checkout-price {
-  font-size: 17px;
-  font-weight: 700;
-  color: #333;
-}
-
-div.checkout div.renter-details {
-  background: #fbfbfb;
-  border: 1px solid #d9d8d9;
-  padding: 25px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-div.checkout div.checkout-tos {
-  margin-top: 10px;
-}
-
-div.checkout div.checkout-buttons {
-  display: inline-block;
-  width: 100%;
-}
-
-div.checkout div.checkout-buttons button,
-div.checkout div.checkout-buttons a {
-  float: right;
-}
-
-div.checkout .btn-checkout {
-  font-size: 18px;
-  line-height: 24px;
-  font-weight: 500;
-  border: 0;
-  border-radius: 5px;
-  color: #fff;
-  height: 42px;
-  min-width: 164px;
-  margin: 0;
-  white-space: nowrap;
-  padding: 5px 32px;
-  margin-left: 7px;
-}
-
-div.checkout .btn-checkout {
-  background: #232323;
-}
-
-div.checkout .btn-cancel {
-  font-size: 18px;
-  line-height: 24px;
-  font-weight: 500;
-  height: 42px;
-  min-width: 164px;
-}
-
-/* div.checkout .btn-cancel {
-  background: #999;
-} */
-
-/* Device width is less than or equal to 960px */
-
-@media only screen and (width <=960px) {
-  div.checkout .checkout-form {
-    padding: 5px;
-    margin: 10px;
-  }
-
-  div.checkout .btn-checkout,
-  div.checkout .btn-cancel {
-    width: 100%;
-  }
-
-  div.checkout div.checkout-options span.checkout-option-value,
-  div.checkout div.checkout-details div.checkout-detail span.checkout-detail-title,
-  div.checkout div.checkout-details div.checkout-detail div.checkout-detail-value {
-    display: table-row;
-  }
-
-  div.checkout div.checkout-details div.checkout-detail div.checkout-detail-value {
-    line-height: 25px;
-  }
-}
-
-/* Device width is greater than or equal to 960px */
-
-@media only screen and (width >=960px) {
-  div.checkout .checkout-form {
-    width: 860px;
-    padding: 30px;
-  }
-
-  div.checkout form,
-  div.checkout div.checkout-options-container,
-  div.checkout div.checkout-details-container,
-  div.checkout div.payment-options-container {
-    width: 800px;
-  }
-
-  div.checkout div.renter-details-form {
-    width: 390px;
   }
 }

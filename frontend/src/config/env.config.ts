@@ -68,13 +68,13 @@ const env = {
   isProduction: import.meta.env.VITE_NODE_ENV === 'production',
   isSafari: /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
 
-  WEBSITE_NAME: String(import.meta.env.VITE_MI_WEBSITE_NAME || "Movin' In"),
+  WEBSITE_NAME: String(import.meta.env.VITE_MI_WEBSITE_NAME || 'Apartmani'),
 
   APP_TYPE: movininTypes.AppType.Frontend,
   API_HOST: String(import.meta.env.VITE_MI_API_HOST),
   LANGUAGES: LANGUAGES.map((l) => l.code),
   _LANGUAGES: LANGUAGES,
-  DEFAULT_LANGUAGE: String(import.meta.env.VITE_MI_DEFAULT_LANGUAGE || 'en'),
+  DEFAULT_LANGUAGE: String(import.meta.env.VITE_MI_DEFAULT_LANGUAGE || 'sr'),
   BASE_CURRENCY: String(import.meta.env.VITE_MI_BASE_CURRENCY || 'USD'),
   CURRENCIES,
   PAGE_SIZE: Number.parseInt(String(import.meta.env.VITE_MI_PAGE_SIZE), 10) || 30,

@@ -34,6 +34,11 @@ const strings = new LocalizedStrings({
     YEARS: 'ans',
     BOOK: 'Réserver',
     PETS_ALLOWED_TOOLTIP: 'Animaux domestiques autorisés',
+    PER_NIGHT: '/ nuit',
+    WHAT_THIS_PLACE_OFFERS: 'Ce que propose ce logement',
+    SHOW_MORE: 'Afficher plus',
+    SHOW_LESS: 'Afficher moins',
+    ENTIRE_PLACE: 'Logement entier',
   },
   en: {
     CANCELLATION: 'Cancellation',
@@ -67,6 +72,11 @@ const strings = new LocalizedStrings({
     YEARS: 'years',
     BOOK: 'Book now',
     PETS_ALLOWED_TOOLTIP: 'Pets allowed',
+    PER_NIGHT: '/ night',
+    WHAT_THIS_PLACE_OFFERS: 'What this place offers',
+    SHOW_MORE: 'Show more',
+    SHOW_LESS: 'Show less',
+    ENTIRE_PLACE: 'Entire place',
   },
   sr: {
     CANCELLATION: 'Otkazivanje',
@@ -100,6 +110,11 @@ const strings = new LocalizedStrings({
     YEARS: 'godina',
     BOOK: 'Rezerviši odmah',
     PETS_ALLOWED_TOOLTIP: 'Kućni ljubimci dozvoljeni',
+    PER_NIGHT: '/ noć',
+    WHAT_THIS_PLACE_OFFERS: 'Šta ovaj smještaj nudi',
+    SHOW_MORE: 'Prikaži više',
+    SHOW_LESS: 'Prikaži manje',
+    ENTIRE_PLACE: 'Cijeli prostor',
   },
 })
 

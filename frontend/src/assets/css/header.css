@@ -1,4 +1,4 @@
-/* Header */
+/* Airbnb-style Header */
 
 .header {
   transform: translate3d(0, 0, 0);
@@ -25,61 +25,130 @@
 }
 
 .side-menu li:hover {
-  background-color: #f1f1f1;
+  background-color: var(--color-bg-secondary);
 }
 
 .header-action {
   margin-right: 20px;
 }
 
+/* Toolbar layout */
+.header .toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--max-width-content);
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--space-6) !important;
+  min-height: var(--header-height) !important;
+}
+
+/* Logo */
+.header .logo {
+  text-decoration: none;
+  text-transform: none;
+  background: transparent;
+  padding: 0 !important;
+  min-width: auto !important;
+}
+
+.header .logo:hover {
+  background: transparent !important;
+}
+
+.header .logo .logo-img {
+  height: 72px;
+  width: auto;
+  display: block;
+}
+
+/* Right side controls */
 .header-desktop {
   display: flex;
   flex-direction: row;
-  flex-grow: 1;
-  justify-content: flex-end;
   align-items: center;
+  gap: var(--space-1);
 }
 
 .header-mobile {
   display: none;
 }
 
+/* Generic header button */
 .header .btn {
   background-color: transparent !important;
-  color: #121212 !important;
+  color: var(--color-text-primary) !important;
   text-transform: none !important;
   width: fit-content;
+  border-radius: var(--radius-full) !important;
+  padding: 6px 12px !important;
+  min-width: auto !important;
 }
 
 .header .btn:hover {
-  background-color: rgba(0, 0, 0, 0.07) !important;
+  background-color: var(--color-bg-secondary) !important;
+}
+
+/* User menu button - Airbnb style pill */
+.header .btn-user-menu {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 21px !important;
+  padding: 5px 5px 5px 12px !important;
+  gap: var(--space-3);
+  transition: box-shadow var(--transition-base) !important;
+}
+
+.header .btn-user-menu:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18) !important;
+  background-color: #fff !important;
+}
+
+.header .btn-user-menu .user-avatar-placeholder {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.header .btn-user-menu .user-avatar-placeholder svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Auth buttons hidden - using user menu dropdown instead */
+.header .btn-auth {
+  font-weight: 500 !important;
+  font-size: var(--font-size-base) !important;
+  padding: 6px 16px !important;
+  color: var(--color-text-primary) !important;
+}
+
+.header .btn-auth:hover {
+  background-color: var(--color-bg-secondary) !important;
 }
 
 .header .btn-auth span.btn-auth-txt {
   white-space: nowrap;
 }
 
-.header .logo {
-  text-decoration: none;
-  text-transform: none;
-  background: transparent;
-  font-size: 18px;
-  font-weight: 500;
-  color: #121212;
-}
-/* Device width is greater than or equal to 960px */
-
-@media only screen and (width >=960px) {
+/* Desktop */
+@media only screen and (width >= 960px) {
   .header {
-    min-height: 64px;
+    min-height: var(--header-height);
+    border-bottom: 1px solid var(--color-border);
   }
 }
 
-/* Device width is less than or equal to 960px */
-
-@media only screen and (width <=960px) {
+/* Mobile */
+@media only screen and (width <= 960px) {
   .header {
-    min-height: 56px;
+    min-height: 64px;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .header-desktop {
@@ -88,10 +157,12 @@
 
   .header-mobile {
     display: flex;
-    margin-right: -13px;
+    align-items: center;
+    gap: var(--space-1);
   }
 
-  .toolbar {
-    min-height: 56px !important;
+  .header .toolbar {
+    min-height: 64px !important;
+    padding: 0 var(--space-4) !important;
   }
 }

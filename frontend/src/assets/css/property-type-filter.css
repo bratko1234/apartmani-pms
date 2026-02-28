@@ -1,26 +1,27 @@
 div.property-type-filter div.filter-elements {
-  padding: 7px 5px;
+  padding: var(--space-2) var(--space-1);
 }
 
 div.property-type-filter div.filter-elements div.filter-element input[type='checkbox'].property-type-checkbox {
   cursor: pointer;
-  margin-left: 5px;
+  margin-left: var(--space-1);
 }
 
 div.property-type-filter div.filter-elements div.filter-element span {
-  margin-left: 5px;
+  margin-left: var(--space-1);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
 }
 
 div.property-type-filter div.filter-actions {
   text-align: center;
-  padding-bottom: 10px;
+  padding-bottom: var(--space-2);
 }
 
 div.property-type-filter div.filter-actions span.uncheckall {
   text-decoration: underline;
   cursor: pointer;
-  color: #0064c8;
+  color: var(--color-primary);
+  font-size: 13px;
 }

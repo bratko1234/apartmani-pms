@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FormControl, Button, } from '@mui/material'
+import { FormControl, Button, IconButton } from '@mui/material'
+import { Search as SearchIcon } from '@mui/icons-material'
 import { DateTimeValidationError } from '@mui/x-date-pickers'
 import * as movininTypes from ':movinin-types'
 import env from '@/config/env.config'
@@ -88,6 +89,7 @@ const SearchForm = (
           onChange={handleLocationChange}
         />
       </FormControl>
+      <div className="search-divider" />
       <FormControl className="from">
         <DatePicker
           label={commonStrings.FROM}
@@ -121,6 +123,7 @@ const SearchForm = (
           language={UserService.getLanguage()}
         />
       </FormControl>
+      <div className="search-divider" />
       <FormControl className="to">
         <DatePicker
           label={commonStrings.TO}
@@ -146,9 +149,9 @@ const SearchForm = (
           language={UserService.getLanguage()}
         />
       </FormControl>
-      <Button type="submit" variant="contained" className="btn-search">
-        {commonStrings.SEARCH}
-      </Button>
+      <IconButton type="submit" className="btn-search" aria-label={commonStrings.SEARCH}>
+        <SearchIcon />
+      </IconButton>
       {onCancel && (
         <Button
           variant="outlined"

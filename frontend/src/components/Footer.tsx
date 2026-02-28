@@ -24,7 +24,9 @@ const Footer = () => {
 
   return (
     <div className="footer">
-      <div className="header">{env.WEBSITE_NAME}</div>
+      <div className="header">
+        <img src="/logo.png" alt={env.WEBSITE_NAME} className="footer-logo" />
+      </div>
       <section className="main">
         <div className="main-section">
           <div className="title">{strings.CORPORATE}</div>

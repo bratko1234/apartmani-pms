@@ -31,6 +31,22 @@ export const getProperty = (id: string): Promise<movininTypes.Property> =>
     .then((res) => res.data)
 
 /**
+ * Get featured properties for homepage (no filters required).
+ *
+ * @param {number} page
+ * @param {number} size
+ * @param {string} [locationId]
+ * @returns {Promise<movininTypes.Result<movininTypes.Property>>}
+ */
+export const getFeaturedProperties = (page: number, size: number, locationId?: string): Promise<movininTypes.Result<movininTypes.Property>> => {
+  const language = UserService.getLanguage()
+  const params = locationId ? `?location=${encodeURIComponent(locationId)}` : ''
+  return axiosInstance
+    .get(`/api/featured-properties/${page}/${size}/${language}${params}`)
+    .then((res) => res.data)
+}
+
+/**
  * Get properties by agency and location.
  *
  * @param {string} keyword

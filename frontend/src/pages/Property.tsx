@@ -4,20 +4,31 @@ import {
   Button,
   FormControl,
 } from '@mui/material'
+import {
+  SingleBed as BedroomsIcon,
+  Shower as BathroomsIcon,
+  AcUnit as AirconIcon,
+  Countertops as KitchensIcon,
+  DirectionsCar as ParkingSpacesIcon,
+  Chair as FurnishedIcon,
+  Pets as PetsAllowedIcon,
+  PhotoSizeSelectSmall as SizeIcon,
+} from '@mui/icons-material'
 import * as movininTypes from ':movinin-types'
 import * as movininHelper from ':movinin-helper'
 import Layout from '@/components/Layout'
 import env from '@/config/env.config'
 import { strings as commonStrings } from '@/lang/common'
 import { strings } from '@/lang/properties'
+import { strings as cpStrings } from '@/lang/property'
 import * as helper from '@/utils/helper'
 import * as PropertyService from '@/services/PropertyService'
 import * as UserService from '@/services/UserService'
-import PropertyInfo from '@/components/PropertyInfo'
+import * as PaymentService from '@/services/PaymentService'
 import NoMatch from './NoMatch'
 import ImageViewer from '@/components/ImageViewer'
-import AgencyBadge from '@/components/AgencyBadge'
 import DatePicker from '@/components/DatePicker'
+import PriceBreakdown from '@/components/PriceBreakdown'
 import Footer from '@/components/Footer'
 import Progress from '@/components/Progress'
 
@@ -41,9 +52,9 @@ const Property = () => {
   const [to, setTo] = useState<Date>()
   const [minDate, setMinDate] = useState<Date>()
   const [maxDate, setMaxDate] = useState<Date>()
-  const [hideAction, setHideAction] = useState(true)
   const [language, setLanguage] = useState(env.DEFAULT_LANGUAGE)
-  const [priceLabel, setPriceLabel] = useState('')
+  const [nightlyPrice, setNightlyPrice] = useState(0)
+  const [descExpanded, setDescExpanded] = useState(false)
 
   useEffect(() => {
     const src = (_image: string) => movininHelper.joinURL(env.CDN_PROPERTIES, _image)
@@ -80,10 +91,6 @@ const Property = () => {
       return
     }
 
-    if (_from || _to) {
-      setHideAction(false)
-    }
-
     setLoading(true)
     const _language = UserService.getLanguage()
     setLanguage(_language)
@@ -101,8 +108,10 @@ const Property = () => {
 
       if (_property) {
         setProperty(_property)
-        const _priceLabel = await helper.priceLabel(_property, _language)
-        setPriceLabel(_priceLabel)
+        if (_property.price) {
+          const _nightlyPrice = await PaymentService.convertPrice(_property.price)
+          setNightlyPrice(_nightlyPrice)
+        }
       } else {
         setNoMatch(true)
       }
@@ -113,6 +122,41 @@ const Property = () => {
     }
   }
 
+  const locationName = property?.location && typeof property.location === 'object' && property.location.name
+    ? property.location.name
+    : undefined
+
+  const amenities: Array<{ icon: React.ReactNode; label: string }> = []
+  if (property) {
+    if (property.bedrooms > 0) {
+      amenities.push({ icon: <BedroomsIcon />, label: `${property.bedrooms} ${cpStrings.BEDROOMS}` })
+    }
+    if (property.bathrooms > 0) {
+      amenities.push({ icon: <BathroomsIcon />, label: `${property.bathrooms} ${cpStrings.BATHROOMS}` })
+    }
+    if (property.kitchens > 0) {
+      amenities.push({ icon: <KitchensIcon />, label: `${property.kitchens} ${cpStrings.KITCHENS}` })
+    }
+    if (property.parkingSpaces > 0) {
+      amenities.push({ icon: <ParkingSpacesIcon />, label: `${property.parkingSpaces} ${cpStrings.PARKING_SPACES}` })
+    }
+    if (property.size) {
+      amenities.push({ icon: <SizeIcon />, label: `${movininHelper.formatNumber(property.size, language)} ${env.SIZE_UNIT}` })
+    }
+    if (property.aircon) {
+      amenities.push({ icon: <AirconIcon />, label: cpStrings.AIRCON })
+    }
+    if (property.furnished) {
+      amenities.push({ icon: <FurnishedIcon />, label: cpStrings.FURNISHED })
+    }
+    if (property.petsAllowed) {
+      amenities.push({ icon: <PetsAllowedIcon />, label: cpStrings.PETS_ALLOWED })
+    }
+  }
+
+  const descriptionHtml = property?.description || ''
+  const isLongDescription = descriptionHtml.length > 300
+
   return (
     <Layout onLoad={onLoad}>
       {
@@ -120,67 +164,139 @@ const Property = () => {
         && (
           <>
             <div className="main-page">
-              <div className="property-card">
-                <div className="property">
-                  <div className="images-container">
-                    {/* Main image */}
-                    <div className="main-image">
-                      <img
-                        className="main-image"
-                        alt=""
-                        src={image}
-                        onClick={() => setOpenImageDialog(true)}
-                      />
-                    </div>
+              <div className="property-detail">
 
-                    {/* Additional images */}
-                    <div className="images">
-                      {
-                        images.map((_image, index) => (
-                          <div
-                            key={_image}
-                            className={`image${currentIndex === index ? ' selected' : ''}`}
-                            onClick={() => {
-                              setCurrentIndex(index)
-                              setImage(_image)
-                            }}
-                            role="button"
-                            tabIndex={0}
-                            aria-label="image"
-                          >
-                            <img alt="" className="image" src={_image} />
-                          </div>
-                        ))
+                {/* Image Gallery Grid */}
+                <div className="gallery">
+                  <div
+                    className="gallery-main"
+                    onClick={() => {
+                      setCurrentIndex(0)
+                      setOpenImageDialog(true)
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setCurrentIndex(0)
+                        setOpenImageDialog(true)
                       }
-                    </div>
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="View gallery"
+                  >
+                    <img alt={property.name} src={image} />
                   </div>
-
-                  {/* Property info */}
-                  <div className="right-panel">
-                    <div className="right-panel-header">
-                      <div className="name"><h2>{property.name}</h2></div>
-                      {priceLabel && <div className="price">{priceLabel}</div>}
+                  {images.length > 1 && (
+                    <div className="gallery-thumbs">
+                      {images.slice(1, 5).map((_image, index) => (
+                        <div
+                          key={_image}
+                          className="gallery-thumb"
+                          onClick={() => {
+                            setCurrentIndex(index + 1)
+                            setOpenImageDialog(true)
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              setCurrentIndex(index + 1)
+                              setOpenImageDialog(true)
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          aria-label="View image"
+                        >
+                          <img alt="" src={_image} />
+                          {index === 3 && images.length > 5 && (
+                            <div className="gallery-thumb-more">
+                              +{images.length - 5}
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                    <PropertyInfo
-                      property={property}
-                      language={language}
-                    />
-                  </div>
+                  )}
                 </div>
 
-                {/* Property description */}
-                <div className="description">
-                  <div dangerouslySetInnerHTML={{ __html: property.description }} />
-                </div>
+                {/* Two-column content */}
+                <div className="property-content">
+                  <div className="property-main">
+                    <h1 className="property-name">{property.name}</h1>
 
-                <div className="property-footer">
-                  {env.HIDE_AGENCIES ? <div /> : <AgencyBadge agency={property.agency} />}
+                    {/* Location summary line: "Entire apartment in Trebinje" */}
+                    <div className="property-summary">
+                      {locationName && (
+                        <span>
+                          {`${strings.ENTIRE_PLACE} · ${locationName}`}
+                        </span>
+                      )}
+                    </div>
 
-                  {
-                    !hideAction
-                    && (
+                    {/* Quick stats: 2 bedrooms · 1 bath · 65 m² */}
+                    <div className="property-quick-stats">
+                      {property.bedrooms > 0 && (
+                        <span>{`${property.bedrooms} ${cpStrings.BEDROOMS}`}</span>
+                      )}
+                      {property.bathrooms > 0 && (
+                        <span>{`${property.bathrooms} ${cpStrings.BATHROOMS}`}</span>
+                      )}
+                      {property.size && (
+                        <span>{`${movininHelper.formatNumber(property.size, language)} ${env.SIZE_UNIT}`}</span>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    {descriptionHtml && (
+                      <div className="property-description">
+                        <div
+                          className={`property-description-text${!descExpanded && isLongDescription ? ' collapsed' : ''}`}
+                          dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                        />
+                        {isLongDescription && (
+                          <button
+                            type="button"
+                            className="property-show-more"
+                            onClick={() => setDescExpanded(!descExpanded)}
+                          >
+                            {descExpanded ? strings.SHOW_LESS : strings.SHOW_MORE}
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Amenities grid */}
+                    {amenities.length > 0 && (
+                      <div className="property-amenities">
+                        <h2 className="property-section-title">{strings.WHAT_THIS_PLACE_OFFERS}</h2>
+                        <div className="amenities-grid">
+                          {amenities.map((amenity) => (
+                            <div key={amenity.label} className="amenity-item">
+                              {amenity.icon}
+                              <span>{amenity.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Booking sidebar widget */}
+                  <div className="property-sidebar">
+                    <div className="property-booking-form">
+                      {/* Price per night header */}
+                      {nightlyPrice > 0 && (
+                        <div className="booking-widget-price">
+                          <span className="booking-widget-price-amount">
+                            {movininHelper.formatPrice(nightlyPrice, commonStrings.CURRENCY, language)}
+                          </span>
+                          <span className="booking-widget-price-unit">{strings.PER_NIGHT}</span>
+                        </div>
+                      )}
+
                       <form
-                        className="action"
+                        className="booking-form"
                         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                           e.preventDefault()
 
@@ -194,64 +310,77 @@ const Property = () => {
                           })
                         }}
                       >
-                        <FormControl className="from">
-                          <DatePicker
-                            label={commonStrings.FROM}
-                            value={from}
-                            minDate={new Date()}
-                            maxDate={maxDate}
-                            variant="outlined"
-                            required
-                            onChange={(date) => {
-                              if (date) {
-                                if (to && to.getTime() <= date.getTime()) {
-                                  setTo(undefined)
+                        <div className="booking-form-dates">
+                          <FormControl className="booking-form-field">
+                            <DatePicker
+                              label={commonStrings.FROM}
+                              value={from}
+                              minDate={new Date()}
+                              maxDate={maxDate}
+                              variant="outlined"
+                              required
+                              onChange={(date) => {
+                                if (date) {
+                                  if (to && to.getTime() <= date.getTime()) {
+                                    setTo(undefined)
+                                  }
+
+                                  const __minDate = new Date(date)
+                                  __minDate.setDate(date.getDate() + 1)
+                                  setMinDate(__minDate)
+                                } else {
+                                  setMinDate(_minDate)
                                 }
 
-                                const __minDate = new Date(date)
-                                __minDate.setDate(date.getDate() + 1)
-                                setMinDate(__minDate)
-                              } else {
-                                setMinDate(_minDate)
-                              }
+                                setFrom(date || undefined)
+                              }}
+                              language={UserService.getLanguage()}
+                            />
+                          </FormControl>
+                          <FormControl className="booking-form-field">
+                            <DatePicker
+                              label={commonStrings.TO}
+                              value={to}
+                              minDate={minDate}
+                              variant="outlined"
+                              required
+                              onChange={(date) => {
+                                if (date) {
+                                  setTo(date)
+                                  const _maxDate = new Date(date)
+                                  _maxDate.setDate(_maxDate.getDate() - 1)
+                                  setMaxDate(_maxDate)
+                                } else {
+                                  setTo(undefined)
+                                  setMaxDate(undefined)
+                                }
+                              }}
+                              language={UserService.getLanguage()}
+                            />
+                          </FormControl>
+                        </div>
 
-                              setFrom(date || undefined)
-                            }}
-                            language={UserService.getLanguage()}
-                          />
-                        </FormControl>
-                        <FormControl className="to">
-                          <DatePicker
-                            label={commonStrings.TO}
-                            value={to}
-                            minDate={minDate}
-                            variant="outlined"
-                            required
-                            onChange={(date) => {
-                              if (date) {
-                                setTo(date)
-                                const _maxDate = new Date(date)
-                                _maxDate.setDate(_maxDate.getDate() - 1)
-                                setMaxDate(_maxDate)
-                              } else {
-                                setTo(undefined)
-                                setMaxDate(undefined)
-                              }
-                            }}
-                            language={UserService.getLanguage()}
-                          />
-                        </FormControl>
                         <Button
                           type="submit"
                           variant="contained"
-                          className="btn-action btn-book"
+                          fullWidth
+                          className="booking-form-btn"
                         >
                           {strings.BOOK}
                         </Button>
                       </form>
-                    )
-                  }
 
+                      {/* Price breakdown (shown when dates selected) */}
+                      {from && to && (
+                        <PriceBreakdown
+                          property={property}
+                          from={from}
+                          to={to}
+                          language={language}
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
 
               </div>

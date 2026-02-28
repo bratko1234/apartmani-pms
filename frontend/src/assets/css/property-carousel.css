@@ -1,0 +1,72 @@
+/* Property Carousel — Airbnb-style horizontal section */
+
+section.property-carousel {
+  width: 100%;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6);
+}
+
+/* Header: title + arrow nav */
+
+.property-carousel-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.property-carousel-header h2 {
+  font-size: var(--font-size-xl);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 26px;
+}
+
+/* Nav arrows — 32px circles with border */
+
+.property-carousel-nav {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2);
+}
+
+.property-carousel-arrow.MuiIconButton-root {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.property-carousel-arrow.MuiIconButton-root:hover {
+  background: var(--color-bg-secondary);
+}
+
+.property-carousel-arrow .MuiSvgIcon-root {
+  font-size: 14px;
+}
+
+/* Slick track — gap between slides */
+
+.property-carousel-track .slick-slide {
+  padding: 0 var(--space-3);
+}
+
+.property-carousel-track .slick-list {
+  margin: 0 calc(var(--space-3) * -1);
+}
+
+/* Mobile */
+
+@media only screen and (width <= 960px) {
+  section.property-carousel {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .property-carousel-header h2 {
+    font-size: var(--font-size-lg);
+  }
+}

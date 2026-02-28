@@ -30,6 +30,9 @@ const strings = new LocalizedStrings({
     PAY_ONLINE_INFO: 'Modification et annulation sous conditions',
     PAYMENT_FAILED: 'Paiement échoué.',
     CHECKING: 'Vérification en cours...',
+    YOUR_TRIP: 'Votre voyage',
+    DATES_LABEL: 'Dates',
+    CONFIRM_AND_PAY: 'Confirmer et payer',
   },
   en: {
     BOOKING_HEADING: 'Book now',
@@ -59,6 +62,9 @@ const strings = new LocalizedStrings({
     PAY_ONLINE_INFO: 'Amendments and cancellation under conditions',
     PAYMENT_FAILED: 'Payment failed.',
     CHECKING: 'Checking in progress...',
+    YOUR_TRIP: 'Your trip',
+    DATES_LABEL: 'Dates',
+    CONFIRM_AND_PAY: 'Confirm and pay',
   },
   sr: {
     BOOKING_HEADING: 'Rezerviši odmah',
@@ -88,6 +94,9 @@ const strings = new LocalizedStrings({
     PAY_ONLINE_INFO: 'Izmjene i otkazivanje pod uslovima',
     PAYMENT_FAILED: 'Plaćanje neuspješno.',
     CHECKING: 'Provjera u toku...',
+    YOUR_TRIP: 'Vaše putovanje',
+    DATES_LABEL: 'Datumi',
+    CONFIRM_AND_PAY: 'Potvrdi i plati',
   },
 })
 

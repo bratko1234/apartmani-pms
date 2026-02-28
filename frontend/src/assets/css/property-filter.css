@@ -1,6 +1,7 @@
 div.property-filter {
   background: #fff;
-  margin: 10px 0;
+  margin: var(--space-2) 0;
+  border-radius: var(--radius-sm);
 }
 
 div.property-filter .location,
@@ -8,19 +9,28 @@ div.property-filter .from,
 div.property-filter .to,
 div.property-filter .search,
 div.property-filter .chk-same-location {
-  padding: 5px;
+  padding: var(--space-1);
 }
 
 div.property-filter .btn-search {
-  background: #232323;
+  background: var(--color-text-primary);
   color: #fff;
-  margin: 5px 0;
+  margin: var(--space-1) 0;
+  border-radius: var(--radius-sm);
+  text-transform: none;
+  font-weight: 500;
+  font-size: var(--font-size-base);
+}
+
+div.property-filter .btn-search:hover {
+  background: #000;
 }
 
 div.property-filter .chk-same-location label {
   cursor: pointer;
   padding: 2px;
   vertical-align: top;
+  font-size: var(--font-size-sm);
 }
 
 div.property-filter .chk-same-location input[type='checkbox'] {

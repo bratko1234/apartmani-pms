@@ -1,68 +1,65 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Tabs, Tab, Dialog, DialogContent, Button } from '@mui/material'
-import {
-  RoomService,
-  Apartment,
-  AccessTime,
-  AttachMoney,
-  Public,
-  FlashOn,
-  CheckBox,
-} from '@mui/icons-material'
-import L from 'leaflet'
+import { Dialog, DialogContent } from '@mui/material'
 import * as movininTypes from ':movinin-types'
 import env from '@/config/env.config'
 import { strings } from '@/lang/home'
 import * as CountryService from '@/services/CountryService'
-import * as LocationService from '@/services/LocationService'
+import * as PropertyService from '@/services/PropertyService'
 import Layout from '@/components/Layout'
 import SearchForm from '@/components/SearchForm'
 import LocationCarrousel from '@/components/LocationCarrousel'
-import TabPanel, { a11yProps } from '@/components/TabPanel'
-import Map from '@/components/Map'
+import PropertyCarousel from '@/components/PropertyCarousel'
 import Footer from '@/components/Footer'
 
 import '@/assets/css/home.css'
 
+interface LocationWithProperties {
+  location: movininTypes.Location
+  properties: movininTypes.Property[]
+}
+
 const Home = () => {
-  const navigate = useNavigate()
-
   const [countries, setCountries] = useState<movininTypes.CountryInfo[]>([])
-  const [tabValue, setTabValue] = useState(0)
+  const [featuredProperties, setFeaturedProperties] = useState<movininTypes.Property[]>([])
+  const [locationProperties, setLocationProperties] = useState<LocationWithProperties[]>([])
   const [openLocationSearchFormDialog, setOpenLocationSearchFormDialog] = useState(false)
-  const [locations, setLocations] = useState<movininTypes.Location[]>([])
   const [location, setLocation] = useState('')
-  const [videoLoaded, setVideoLoaded] = useState(false)
-
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue)
-  }
-
-  const handleIntersection = (entries: IntersectionObserverEntry[]) => {
-    entries.forEach((entry) => {
-      const video = entry.target as HTMLVideoElement
-      if (entry.isIntersecting) {
-        video.muted = true
-        video.play()
-      } else {
-        video.pause()
-      }
-    })
-  }
 
   const onLoad = async () => {
-    const _countries = await CountryService.getCountriesWithLocations('', true, env.MIN_LOCATIONS)
-    setCountries(_countries)
-    const _locations = await LocationService.getLocationsWithPosition()
-    setLocations(_locations)
+    try {
+      const _countries = await CountryService.getCountriesWithLocations('', false, 1)
+      setCountries(_countries)
 
-    const observer = new IntersectionObserver(handleIntersection)
-    const video = document.getElementById('cover') as HTMLVideoElement
-    if (video) {
-      observer.observe(video)
-    } else {
-      console.error('Cover video not found')
+      // Fetch featured properties (first 8, no filters required)
+      const CAROUSEL_SIZE = 8
+      const featuredResult = await PropertyService.getFeaturedProperties(1, CAROUSEL_SIZE)
+      if (featuredResult && featuredResult.length > 0) {
+        setFeaturedProperties(featuredResult[0].resultData)
+      }
+
+      // Fetch per-location properties for up to 3 locations
+      const allLocations = _countries.flatMap((c) => c.locations ?? [])
+      const topLocations = allLocations.slice(0, 5)
+
+      const locResults = (
+        await Promise.all(
+          topLocations.map(async (loc): Promise<LocationWithProperties | null> => {
+            try {
+              const result = await PropertyService.getFeaturedProperties(1, CAROUSEL_SIZE, loc._id)
+              if (result && result.length > 0 && result[0].resultData.length > 0) {
+                return { location: loc, properties: result[0].resultData }
+              }
+            } catch {
+              // Skip locations that fail to load
+            }
+            return null
+          })
+        )
+      ).filter((r): r is LocationWithProperties => r !== null)
+
+      setLocationProperties(locResults)
+    } catch {
+      // Countries/featured fetch failed — page renders with empty sections
     }
   }
 
@@ -70,199 +67,52 @@ const Home = () => {
     <Layout onLoad={onLoad} strict={false}>
       <div className="home">
 
-        <div className="home-content">
-
-          <div className="video">
-            <video
-              id="cover"
-              muted={!env.isSafari}
-              autoPlay={!env.isSafari}
-              loop
-              playsInline
-              disablePictureInPicture
-              onLoadedData={async () => {
-                setVideoLoaded(true)
-              }}
-            >
-              <source src="cover.mp4" type="video/mp4" />
-              <track kind="captions" />
-            </video>
-            {!videoLoaded && (
-              <div className="video-background" />
-            )}
-          </div>
-
-          <div className="home-title">{strings.TITLE}</div>
-          <div className="home-cover">{strings.COVER}</div>
-          {/* <div className="home-subtitle">{strings.SUBTITLE}</div> */}
-
-        </div>
-
-        <div className="search">
-          <div className="home-search">
+        {/* Search Hero */}
+        <div className="home-search">
+          <h1 className="home-search-title">{strings.HERO_TITLE}</h1>
+          <div className="home-search-form">
             <SearchForm />
           </div>
         </div>
 
-        <div className="services">
+        {/* Featured Properties Carousel */}
+        {featuredProperties.length > 0 && (
+          <PropertyCarousel
+            title={strings.FEATURED_TITLE}
+            properties={featuredProperties}
+          />
+        )}
 
-          <h1>{strings.SERVICES_TITLE}</h1>
-
-          <div className="services-boxes">
-
-            <div className="services-box">
-              <div className="services-icon-wrapper">
-                <Apartment className="services-icon" />
-              </div>
-              <div className="services-text-wrapper">
-                <span className="services-title">{strings.SERVICES_FLEET_TITLE}</span>
-                <span className="services-text">{strings.SERVICES_FLEET}</span>
-              </div>
-            </div>
-
-            <div className="services-box">
-              <div className="services-icon-wrapper">
-                <AccessTime className="services-icon" />
-              </div>
-              <div className="services-text-wrapper">
-                <span className="services-title">{strings.SERVICES_FLEXIBLE_TITLE}</span>
-                <span className="services-text">{strings.SERVICES_FLEXIBLE}</span>
-              </div>
-            </div>
-
-            <div className="services-box">
-              <div className="services-icon-wrapper">
-                <AttachMoney className="services-icon" />
-              </div>
-              <div className="services-text-wrapper">
-                <span className="services-title">{strings.SERVICES_PRICES_TITLE}</span>
-                <span className="services-text">{strings.SERVICES_PRICES}</span>
-              </div>
-            </div>
-
-            <div className="services-box">
-              <div className="services-icon-wrapper">
-                <Public className="services-icon" />
-              </div>
-              <div className="services-text-wrapper">
-                <span className="services-title">{strings.SERVICES_BOOKING_ONLINE_TITLE}</span>
-                <span className="services-text">{strings.SERVICES_BOOKING_ONLINE}</span>
-              </div>
-            </div>
-
-            <div className="services-box">
-              <div className="services-icon-wrapper">
-                <FlashOn className="services-icon" />
-              </div>
-              <div className="services-text-wrapper">
-                <span className="services-title">{strings.SERVICE_INSTANT_BOOKING_TITLE}</span>
-                <span className="services-text">{strings.SERVICE_INSTANT_BOOKING}</span>
-              </div>
-            </div>
-
-            <div className="services-box">
-              <div className="services-icon-wrapper">
-                <RoomService className="services-icon" />
-              </div>
-              <div className="services-text-wrapper">
-                <span className="services-title">{strings.SERVICES_SUPPORT_TITLE}</span>
-                <span className="services-text">{strings.SERVICES_SUPPORT}</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
+        {/* Destinations */}
         {countries.length > 0 && (
           <div className="destinations">
-            <h1>{strings.DESTINATIONS_TITLE}</h1>
-            <div className="tabs">
-              <Tabs
-                value={tabValue}
-                onChange={handleTabChange}
-                aria-label="destinations"
-                TabIndicatorProps={{ sx: { display: env.isMobile ? 'none' : null } }}
-                sx={{
-                  '& .MuiTabs-flexContainer': {
-                    flexWrap: 'wrap',
-                  },
-                }}
-              >
-                {
-                  countries.map((country, index) => (
-                    <Tab key={country._id} label={country.name?.toUpperCase()} {...a11yProps(index)} />
-                  ))
-                }
-              </Tabs>
-
-              {
-                countries.map((country, index) => (
-                  <TabPanel key={country._id} value={tabValue} index={index}>
-                    <LocationCarrousel
-                      locations={country.locations!}
-                      onSelect={(_location) => {
-                        setLocation(_location._id)
-                        setOpenLocationSearchFormDialog(true)
-                      }}
-                    />
-                  </TabPanel>
-                ))
-              }
+            <div className="section-header">
+              <h2>{strings.DESTINATIONS_TITLE}</h2>
+            </div>
+            <div className="destinations-carousel">
+              {countries.map((country) => (
+                <LocationCarrousel
+                  key={country._id}
+                  locations={country.locations ?? []}
+                  onSelect={(_location) => {
+                    setLocation(_location._id)
+                    setOpenLocationSearchFormDialog(true)
+                  }}
+                />
+              ))}
             </div>
           </div>
         )}
 
-        <div className="home-map">
-          <Map
-            title={strings.MAP_TITLE}
-            position={new L.LatLng(env.MAP_LATITUDE, env.MAP_LONGITUDE)}
-            initialZoom={env.MAP_ZOOM}
-            locations={locations}
-            onSelelectLocation={async (locationId) => {
-              setLocation(locationId)
-              setOpenLocationSearchFormDialog(true)
-            }}
+        {/* Per-Location Property Carousels */}
+        {locationProperties.map(({ location: loc, properties }) => (
+          <PropertyCarousel
+            key={loc._id}
+            title={`${strings.STAY_IN} ${loc.name}`}
+            properties={properties}
           />
-        </div>
+        ))}
 
-        <div className="customer-care">
-          <div className="customer-care-wrapper">
-            <div className="customer-care-text">
-              <h1>{strings.CUSTOMER_CARE_TITLE}</h1>
-              <h2>{strings.CUSTOMER_CARE_SUBTITLE}</h2>
-              <div className="customer-care-content">{strings.CUSTOMER_CARE_TEXT}</div>
-              <div className="customer-care-boxes">
-                <div className="customer-care-box">
-                  <CheckBox className="customer-care-icon" />
-                  <span>{strings.CUSTOMER_CARE_ASSISTANCE}</span>
-                </div>
-                <div className="customer-care-box">
-                  <CheckBox className="customer-care-icon" />
-                  <span>{strings.CUSTOMER_CARE_MODIFICATION}</span>
-                </div>
-                <div className="customer-care-box">
-                  <CheckBox className="customer-care-icon" />
-                  <span>{strings.CUSTOMER_CARE_GUIDANCE}</span>
-                </div>
-                <div className="customer-care-box">
-                  <CheckBox className="customer-care-icon" />
-                  <span>{strings.CUSTOMER_CARE_SUPPORT}</span>
-                </div>
-              </div>
-              <Button
-                variant="contained"
-                className="btn-primary btn-home"
-                onClick={() => navigate('/contact')}
-              >
-                {strings.CONTACT_US}
-              </Button>
-            </div>
-
-            <div className="customer-care-img">
-              <img src="/customer-care.png" alt="" />
-            </div>
-          </div>
-        </div>
         <Footer />
       </div>
 
@@ -277,9 +127,6 @@ const Home = () => {
         <DialogContent className="search-dialog-content">
           <SearchForm
             location={location}
-          // onCancel={() => {
-          //   setOpenLocationSearchFormDialog(false)
-          // }}
           />
         </DialogContent>
       </Dialog>

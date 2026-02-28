@@ -49,7 +49,7 @@ export const expireAt = 'expireAt'
  *
  * @type {string}
  */
-export const WEBSITE_NAME = __env__('MI_WEBSITE_NAME', false, "Movin' In")
+export const WEBSITE_NAME = __env__('MI_WEBSITE_NAME', false, 'Apartmani')
 
 /**
  * Indicate whether we are in CI environment or not.
@@ -310,7 +310,7 @@ export const FRONTEND_HOST = __env__('MI_FRONTEND_HOST', true)
  *
  * @type {string}
  */
-export const DEFAULT_LANGUAGE = __env__('MI_DEFAULT_LANGUAGE', false, 'en')
+export const DEFAULT_LANGUAGE = __env__('MI_DEFAULT_LANGUAGE', false, 'sr')
 
 /**
  * Default Minimum age for rental. Default is 21 years.

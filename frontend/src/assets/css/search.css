@@ -1,84 +1,115 @@
+/* Airbnb-style search results page */
+
 div.properties {
   display: flex;
+  flex-direction: row;
   flex: 1 0 auto;
   transform: translate3d(0, 0, 0);
-}
-
-div.properties div.search {
   width: 100%;
+  min-height: calc(100vh - var(--header-height));
+}
+
+/* Left panel: filters + property grid */
+
+div.properties div.col-1 {
+  flex: 1;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-6);
+  overflow-y: auto;
 }
 
-div.properties div.col-1 .map {
-  margin-top: 20px;
-  min-height: 0;
-  height: 180px;
-  margin-bottom: 3px;
-}
+/* Filter bar — horizontal pills */
 
-div.properties div.col-1 .filter,
-div.properties div.col-1 div.info-box {
+div.properties div.col-1 .filter {
   background-color: #fff;
 }
 
-/* Device width is less than or equal to 960px */
+div.properties div.search-filters {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-6);
+}
 
-@media only screen and (width <=960px) {
+/* Right panel: sticky map */
+
+div.properties div.col-1 .map {
+  margin-bottom: var(--space-4);
+  min-height: 0;
+  height: 200px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+div.properties div.col-2 {
+  width: 100%;
+}
+
+/* Mobile */
+
+@media only screen and (width <= 960px) {
   div.properties {
-    flex: 0 1 auto;
     flex-direction: column;
-  }
-
-  div.properties .sc-search {
-    width: 80%;
-  }
-
-  div.properties .new-property {
-    margin: 20px 5px 5px 0;
-    width: 100%;
+    padding: 0;
   }
 
   div.properties div.col-1 {
     width: 100%;
-    padding: 15px;
+    padding: var(--space-4);
     display: flex;
     flex-direction: column;
-    justify-content: center;
   }
 
-  div.properties div.col-1 div.col-1-container {
-    width: 100%;
-    max-width: 480px;
-  }
-
-  div.properties .property-filter {
-    text-align: left;
+  div.properties div.col-1 .map {
+    height: 160px;
+    border-radius: var(--radius-sm);
   }
 
   div.properties div.col-2 {
-    margin-top: 3px;
-    padding: 1px;
+    padding: 0 var(--space-4) var(--space-4);
     width: 100%;
     display: flex;
     justify-content: center;
   }
 
-  div.properties div.col-1 .property-count {
-    display: none;
+  div.properties div.search-filters {
+    gap: var(--space-2);
+    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
   }
 }
 
-/* Device width is greater than or equal to 960px */
+/* Desktop */
 
-@media only screen and (width >=960px) {
+@media only screen and (width >= 960px) {
   div.properties {
-    flex-direction: row;
+    flex-direction: column;
+    max-width: var(--max-width-content);
+    margin: 0 auto;
+    padding: 0 var(--space-6);
   }
 
   div.properties div.col-1 {
-    width: 300px;
-    margin-left: 20px;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-4) 0;
+  }
+
+  div.properties div.col-1 .map {
+    width: 100%;
+  }
+
+  div.properties div.col-1 .filter {
+    flex: 1;
+    min-width: 200px;
   }
 
   div.properties div.col-2 {
@@ -86,14 +117,5 @@ div.properties div.col-1 div.info-box {
     flex-direction: column;
     align-items: center;
     flex: 1 0 auto;
-  }
-
-  div.properties div.search {
-    margin-top: 15px;
-  }
-
-  div.properties .new-property {
-    margin: 10px 5px 0 0;
-    width: 100%;
   }
 }

@@ -30,7 +30,7 @@ const env = {
   API_HOST: String(import.meta.env.VITE_MI_API_HOST),
   LANGUAGES: LANGUAGES.map((l) => l.code),
   _LANGUAGES: LANGUAGES,
-  DEFAULT_LANGUAGE: String(import.meta.env.VITE_MI_DEFAULT_LANGUAGE || 'en'),
+  DEFAULT_LANGUAGE: String(import.meta.env.VITE_MI_DEFAULT_LANGUAGE || 'sr'),
   PAGE_SIZE: Number.parseInt(String(import.meta.env.VITE_MI_PAGE_SIZE), 10) || 30,
   PROPERTIES_PAGE_SIZE: Number.parseInt(String(import.meta.env.VITE_MI_PROPERTIES_PAGE_SIZE), 10) || 15,
   BOOKINGS_PAGE_SIZE: Number.parseInt(String(import.meta.env.VITE_MI_BOOKINGS_PAGE_SIZE), 10) || 20,

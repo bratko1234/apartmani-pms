@@ -1,23 +1,25 @@
 div.property div.property-agency a.property-agency-info {
-    color: #0064c8;
-    text-decoration: underline;
-    font-size: 0.9em;
-    line-height: 1em;
-    white-space: nowrap;
-    margin-left: 5px;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  font-size: var(--font-size-sm);
+  line-height: 1em;
+  white-space: nowrap;
+  margin-left: 5px;
 }
 
 div.property-info {
-    float: left;
-    margin-top: 5px;
+  float: left;
+  margin-top: var(--space-1);
 }
 
 div.property-info ul.property-info-list {
-    position: relative;
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-flow: row wrap;
+  position: relative;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-2);
+  margin: 0;
 }
 
 div.property-info ul.property-info-list li.property-type,
@@ -26,48 +28,73 @@ div.property-info ul.property-info-list li.bathrooms,
 div.property-info ul.property-info-list li.kitchens,
 div.property-info ul.property-info-list li.parking-spaces,
 div.property-info ul.property-info-list li.aircon {
-    min-width: 60px;
-    margin-bottom: 10px;
-    padding: 3px 5px 0 0;
-    box-shadow: 0 0 0 1px #ddd inset;
-    margin-left: 5px;
-    border-radius: 5px;
-    text-align: center;
+  min-width: 56px;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  text-align: center;
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+div.property-info ul.property-info-list li .property-info-list-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+div.property-info ul.property-info-list li svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-secondary);
 }
 
 div.property-info ul.extras-list {
-    position: relative;
-    list-style: none;
-    padding: 0;
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0 0;
 }
 
 div.property-info ul.extras-list li {
-    margin: 5px;
-    width: 100%;
+  margin: var(--space-1) 0;
+  width: 100%;
 }
 
 div.property-info ul.extras-list div.property-info-list-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+div.property-info ul.extras-list div.property-info-list-item svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-secondary);
 }
 
 div.property-info ul.extras-list .extra-info {
-    color: rgb(0 0 0 / 35%);
+  color: var(--color-text-muted);
 }
 
 div.property-info ul.extras-list span.property-info-list-text {
-    vertical-align: super;
-    margin-left: 3px;
+  vertical-align: middle;
+  margin-left: var(--space-2);
+  font-size: 13px;
+  color: var(--color-text-secondary);
 }
 
 div.property-info ul.property-info-list span.property-info-list-text {
-    vertical-align: super;
-    margin-left: 3px;
+  vertical-align: middle;
+  margin-left: 2px;
+  font-size: 13px;
 }
 
 div.property-info ul.property-info-list li .property-bathrooms {
-    width: 20px;
-    height: 20px;
-    margin: 2px;
+  width: 18px;
+  height: 18px;
+  margin: 2px;
 }
