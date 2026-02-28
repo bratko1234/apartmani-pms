@@ -17,10 +17,12 @@ services:
     env_file: ./backend/.env.docker.example
     environment:
       - MI_DB_URI=mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD}@mongo:27017/movinin?authSource=admin&appName=movinin
+      - MI_ADMIN_HOST=${SERVICE_URL_MI_ADMIN:-http://localhost:3003}/
+      - MI_FRONTEND_HOST=${SERVICE_URL_MI_FRONTEND:-http://localhost:8081}/
+      - MI_AUTH_COOKIE_DOMAIN=.sslip.io
     restart: always
     depends_on:
       - mongo
-
     volumes:
       - cdn:/var/www/cdn/movinin
       - backend_logs:/movinin/backend/logs
@@ -29,6 +31,8 @@ services:
     build:
       context: .
       dockerfile: ./admin/Dockerfile
+      args:
+        SERVICE_URL_MI_BACKEND: ${SERVICE_URL_MI_BACKEND:-http://localhost:4004}
     depends_on:
       - mi-backend
     restart: always
@@ -37,6 +41,8 @@ services:
     build:
       context: .
       dockerfile: ./frontend/Dockerfile
+      args:
+        SERVICE_URL_MI_BACKEND: ${SERVICE_URL_MI_BACKEND:-http://localhost:4004}
     depends_on:
       - mi-backend
     restart: always
