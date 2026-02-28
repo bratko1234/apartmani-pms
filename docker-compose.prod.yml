@@ -14,12 +14,38 @@ services:
     build:
       context: .
       dockerfile: ./backend/Dockerfile
-    env_file: ./backend/.env.docker.example
     environment:
+      - NODE_ENV=production
+      - MI_PORT=4004
+      - MI_HTTPS=false
       - MI_DB_URI=mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD}@mongo:27017/movinin?authSource=admin&appName=movinin
+      - MI_DB_SSL=false
+      - MI_DB_DEBUG=false
+      - MI_DB_SERVER_SIDE_JAVASCRIPT=false
+      - MI_COOKIE_SECRET=${MI_COOKIE_SECRET:-ChangeMeToSomethingSecure32Chars}
+      - MI_AUTH_COOKIE_DOMAIN=${MI_AUTH_COOKIE_DOMAIN:-.sslip.io}
       - MI_ADMIN_HOST=${SERVICE_URL_MI_ADMIN:-http://localhost:3003}/
       - MI_FRONTEND_HOST=${SERVICE_URL_MI_FRONTEND:-http://localhost:8081}/
-      - MI_AUTH_COOKIE_DOMAIN=.sslip.io
+      - MI_JWT_SECRET=${MI_JWT_SECRET:-ChangeMeToSomethingSecure32Chars}
+      - MI_JWT_EXPIRE_AT=86400
+      - MI_TOKEN_EXPIRE_AT=86400
+      - MI_SMTP_HOST=${MI_SMTP_HOST:-smtp.sendgrid.net}
+      - MI_SMTP_PORT=${MI_SMTP_PORT:-587}
+      - MI_SMTP_USER=${MI_SMTP_USER:-apikey}
+      - MI_SMTP_PASS=${MI_SMTP_PASS:-placeholder}
+      - MI_SMTP_FROM=${MI_SMTP_FROM:-no-reply@apartmani.ba}
+      - MI_CDN_ROOT=/var/www/cdn
+      - MI_CDN_USERS=/var/www/cdn/movinin/users
+      - MI_CDN_TEMP_USERS=/var/www/cdn/movinin/temp/users
+      - MI_CDN_PROPERTIES=/var/www/cdn/movinin/properties
+      - MI_CDN_TEMP_PROPERTIES=/var/www/cdn/movinin/temp/properties
+      - MI_CDN_LOCATIONS=/var/www/cdn/movinin/locations
+      - MI_CDN_TEMP_LOCATIONS=/var/www/cdn/movinin/temp/locations
+      - MI_DEFAULT_LANGUAGE=sr
+      - MI_MINIMUM_AGE=21
+      - MI_WEBSITE_NAME=Apartmani
+      - MI_TIMEZONE=Europe/Sarajevo
+      - MI_ADMIN_EMAIL=admin@movinin.io
     restart: always
     depends_on:
       - mongo
