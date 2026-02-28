@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import {
   Button,
   FormControl,
@@ -26,7 +26,9 @@ import * as PropertyService from '@/services/PropertyService'
 import * as UserService from '@/services/UserService'
 import * as PaymentService from '@/services/PaymentService'
 import NoMatch from './NoMatch'
+import SEO from '@/components/SEO'
 import ImageViewer from '@/components/ImageViewer'
+import { truncateDescription, buildPropertyUrl } from '@/utils/seo'
 import DatePicker from '@/components/DatePicker'
 import PriceBreakdown from '@/components/PriceBreakdown'
 import Footer from '@/components/Footer'
@@ -37,6 +39,7 @@ import '@/assets/css/property.css'
 const Property = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const params = useParams<{ id?: string; slug?: string }>()
 
   const _minDate = new Date()
   _minDate.setDate(_minDate.getDate() + 1)
@@ -78,13 +81,12 @@ const Property = () => {
 
   const onLoad = async () => {
     const { state } = location
-    if (!state) {
-      setNoMatch(true)
-      return
-    }
-    const { propertyId } = state
-    const { from: _from } = state
-    const { to: _to } = state
+
+    // Support SEO-friendly URL: /property/:id/:slug?
+    // Fall back to location.state for backward compatibility
+    const propertyId = params.id || state?.propertyId
+    const _from = state?.from
+    const _to = state?.to
 
     if (!propertyId) {
       setNoMatch(true)
@@ -159,6 +161,31 @@ const Property = () => {
 
   return (
     <Layout onLoad={onLoad}>
+      {!loading && property && (
+        <SEO
+          title={property.name}
+          description={truncateDescription(property.description || '')}
+          image={image || undefined}
+          url={buildPropertyUrl(window.location.origin, property._id as string, property.name)}
+          type="place"
+          jsonLd={{
+            '@context': 'https://schema.org',
+            '@type': 'LodgingBusiness',
+            name: property.name,
+            description: truncateDescription(property.description || '', 300),
+            image: image || undefined,
+            url: buildPropertyUrl(window.location.origin, property._id as string, property.name),
+            address: locationName
+              ? {
+                '@type': 'PostalAddress',
+                addressLocality: locationName,
+              }
+              : undefined,
+            numberOfRooms: property.bedrooms > 0 ? property.bedrooms : undefined,
+          }}
+        />
+      )}
+
       {
         !loading && property && image
         && (

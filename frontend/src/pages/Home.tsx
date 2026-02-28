@@ -6,6 +6,7 @@ import { strings } from '@/lang/home'
 import * as CountryService from '@/services/CountryService'
 import * as PropertyService from '@/services/PropertyService'
 import Layout from '@/components/Layout'
+import SEO from '@/components/SEO'
 import SearchForm from '@/components/SearchForm'
 import LocationCarrousel from '@/components/LocationCarrousel'
 import PropertyCarousel from '@/components/PropertyCarousel'
@@ -65,6 +66,26 @@ const Home = () => {
 
   return (
     <Layout onLoad={onLoad} strict={false}>
+      <SEO
+        title="Pronađite savršen smještaj"
+        description="Rezervišite apartmane i smještaj u Trebinju i okolini. Najbolje cijene za direktne rezervacije na apartmani.ba."
+        url={window.location.origin}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: env.WEBSITE_NAME,
+          url: window.location.origin,
+          description: 'Rezervišite apartmane i smještaj u Trebinju i okolini. Najbolje cijene za direktne rezervacije.',
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: {
+              '@type': 'EntryPoint',
+              urlTemplate: `${window.location.origin}/search?q={search_term_string}`,
+            },
+            'query-input': 'required name=search_term_string',
+          },
+        }}
+      />
       <div className="home">
 
         {/* Search Hero */}

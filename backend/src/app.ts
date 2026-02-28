@@ -23,6 +23,7 @@ import ownerRoutes from './routes/ownerRoutes'
 import payoutRoutes from './routes/payoutRoutes'
 import rateRoutes from './routes/rateRoutes'
 import messageRoutes from './routes/messageRoutes'
+import seoRoutes from './routes/seoRoutes'
 import * as helper from './utils/helper'
 
 const app = express()
@@ -70,6 +71,7 @@ app.use('/', ownerRoutes)
 app.use('/', payoutRoutes)
 app.use('/', rateRoutes)
 app.use('/', messageRoutes)
+app.use('/', seoRoutes)
 
 if (env.ENABLE_SENTRY) {
   Sentry.setupExpressErrorHandler(app)

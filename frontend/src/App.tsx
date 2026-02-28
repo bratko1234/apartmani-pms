@@ -77,6 +77,7 @@ const router = createBrowserRouter([
       { path: '/forgot-password', element: <ForgotPassword /> },
       { path: '/reset-password', element: <ResetPassword /> },
       { path: '/search', element: <Search /> },
+      { path: '/property/:id/:slug?', element: <Property /> },
       { path: '/property', element: <Property /> },
       { path: '/checkout', element: <Checkout /> },
       { path: '/checkout-session/:sessionId', element: <CheckoutSession /> },
