@@ -45,6 +45,7 @@ const Scheduler = lazy(() => import('@/pages/Scheduler'))
 const OwnerDashboard = lazy(() => import('@/pages/OwnerDashboard'))
 const OwnerCalendar = lazy(() => import('@/pages/OwnerCalendar'))
 const OwnerRevenue = lazy(() => import('@/pages/OwnerRevenue'))
+const RateManagement = lazy(() => import('@/pages/RateManagement'))
 
 const AppLayout = () => {
   const location = useLocation()
@@ -113,6 +114,7 @@ const router = createBrowserRouter([
       { path: '/owner-dashboard', element: <OwnerDashboard /> },
       { path: '/owner-calendar', element: <OwnerCalendar /> },
       { path: '/owner-revenue', element: <OwnerRevenue /> },
+      { path: '/rate-management', element: <RateManagement /> },
       { path: '*', element: <NoMatch /> }
     ]
   }
