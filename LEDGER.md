@@ -22,10 +22,12 @@
 
 | Stavka | Opis | Status | Datum |
 |--------|------|--------|-------|
+| Seed data za testiranje | 3 vlasnika, 10 gostiju, ~110 rezervacija, sezone, popusti, isplate, poruke | ZAVRSENO | 2026-02-28 |
+| Ispravke agencija/vlasnika | Uklonjen avatar filter, AccountCircle fallback, vlasnici vidljivi svuda | ZAVRSENO | 2026-02-28 |
+| Dashboard sa grafikonima | Admin vidi sve vlasnike (agregirano + filter), agency vidi samo svoje | ZAVRSENO | 2026-02-28 |
+| UI za upravljanje cijenama | Sezonske cijene, popusti, property search fix ($in:[] bug) | ZAVRSENO | 2026-02-28 |
 | Modul za isplate vlasnicima | Mjesecni izvjestaji, odobrenje, oznacavanje placanja | CEKA | — |
-| UI za upravljanje cijenama | Sezonske cijene, min/max nocenja, push ka Channex-u | CEKA | — |
 | Proslijedjivanje poruka gostiju | Channex → PMS → vlasnik | CEKA | — |
-| Dashboard sa grafikonima | Grafovi zauzetosti i prihoda za vlasnike | CEKA | — |
 | SEO optimizacija | Schema.org, sitemap, SSR/SSG | CEKA | — |
 | Clansko snizenje | Loyalty popusti, samo za direktne | CEKA | — |
 
@@ -54,3 +56,4 @@
 |-------|--------|------|
 | 2026-02-27 | d09dfbd | feat: implementacija Faze 1 MVP (109 fajlova) |
 | 2026-02-27 | d1defe6 | fix: ispravke TypeScript gresaka u owner portal stranicama |
+| 2026-02-28 | ee7abd2 | feat: seed data, admin ispravke, owner dashboard poboljsanja (21 fajl) |
