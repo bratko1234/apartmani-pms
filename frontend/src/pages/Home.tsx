@@ -33,7 +33,7 @@ const Home = () => {
       // Fetch featured properties (first 8, no filters required)
       const CAROUSEL_SIZE = 8
       const featuredResult = await PropertyService.getFeaturedProperties(1, CAROUSEL_SIZE)
-      if (featuredResult && featuredResult.length > 0) {
+      if (featuredResult && featuredResult.length > 0 && featuredResult[0]) {
         setFeaturedProperties(featuredResult[0].resultData)
       }
 
@@ -46,7 +46,7 @@ const Home = () => {
           topLocations.map(async (loc): Promise<LocationWithProperties | null> => {
             try {
               const result = await PropertyService.getFeaturedProperties(1, CAROUSEL_SIZE, loc._id)
-              if (result && result.length > 0 && result[0].resultData.length > 0) {
+              if (result && result.length > 0 && result[0] && result[0].resultData.length > 0) {
                 return { location: loc, properties: result[0].resultData }
               }
             } catch {
