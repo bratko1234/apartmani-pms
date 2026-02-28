@@ -18,6 +18,7 @@ interface BookingSummaryProps {
   to: Date
   language: string
   hideBookButton?: boolean
+  user?: movininTypes.User
 }
 
 const BookingSummary = ({
@@ -27,6 +28,7 @@ const BookingSummary = ({
   to,
   language,
   hideBookButton,
+  user,
 }: BookingSummaryProps) => {
   const navigate = useNavigate()
 
@@ -70,6 +72,7 @@ const BookingSummary = ({
           from={from}
           to={to}
           language={language}
+          user={user}
         />
         {!hideBookButton && (
           <Button

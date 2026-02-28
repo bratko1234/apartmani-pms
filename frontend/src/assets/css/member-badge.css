@@ -1,0 +1,98 @@
+/* Member badge chip */
+.member-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.member-badge-icon {
+  font-size: 16px;
+}
+
+/* Member pricing on property page */
+.member-pricing {
+  margin-top: var(--space-2, 8px);
+}
+
+.member-pricing-active {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}
+
+.member-pricing-original {
+  font-size: var(--font-size-md, 1rem);
+  color: var(--color-text-secondary, #717171);
+  text-decoration: line-through;
+}
+
+.member-pricing-discounted {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+}
+
+.member-pricing-discounted-amount {
+  font-size: var(--font-size-xl, 1.25rem);
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.member-pricing-discounted-unit {
+  font-size: var(--font-size-md, 1rem);
+  color: var(--color-text-secondary, #717171);
+}
+
+/* CTA for non-members */
+.member-pricing-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  margin-top: var(--space-2, 8px);
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: #fff3e0;
+  border: 1px solid #ffe0b2;
+}
+
+.member-pricing-cta-icon {
+  color: #e65100;
+  font-size: 20px;
+}
+
+.member-pricing-cta a {
+  color: #e65100;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.member-pricing-cta a:hover {
+  text-decoration: underline;
+}
+
+/* Discount line in price breakdown */
+.price-breakdown-discount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-breakdown-discount-label {
+  font-size: var(--font-size-lg, 1.125rem);
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.price-breakdown-discount-value {
+  font-size: var(--font-size-lg, 1.125rem);
+  color: #2e7d32;
+  font-weight: 500;
+}

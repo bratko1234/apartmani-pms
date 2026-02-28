@@ -21,18 +21,22 @@ import env from '@/config/env.config'
 import { strings as commonStrings } from '@/lang/common'
 import { strings } from '@/lang/properties'
 import { strings as cpStrings } from '@/lang/property'
+import { strings as memberStrings } from '@/lang/member-pricing'
 import * as helper from '@/utils/helper'
 import * as PropertyService from '@/services/PropertyService'
 import * as UserService from '@/services/UserService'
 import * as PaymentService from '@/services/PaymentService'
+import * as DiscountService from '@/services/DiscountService'
 import NoMatch from './NoMatch'
 import ImageViewer from '@/components/ImageViewer'
 import DatePicker from '@/components/DatePicker'
 import PriceBreakdown from '@/components/PriceBreakdown'
+import MemberBadge from '@/components/MemberBadge'
 import Footer from '@/components/Footer'
 import Progress from '@/components/Progress'
 
 import '@/assets/css/property.css'
+import '@/assets/css/member-badge.css'
 
 const Property = () => {
   const navigate = useNavigate()
@@ -55,6 +59,9 @@ const Property = () => {
   const [language, setLanguage] = useState(env.DEFAULT_LANGUAGE)
   const [nightlyPrice, setNightlyPrice] = useState(0)
   const [descExpanded, setDescExpanded] = useState(false)
+  const [user, setUser] = useState<movininTypes.User>()
+  const [discountPercent, setDiscountPercent] = useState(0)
+  const [memberNightlyPrice, setMemberNightlyPrice] = useState(0)
 
   useEffect(() => {
     const src = (_image: string) => movininHelper.joinURL(env.CDN_PROPERTIES, _image)
@@ -76,7 +83,9 @@ const Property = () => {
     }
   }, [openImageDialog])
 
-  const onLoad = async () => {
+  const onLoad = async (_user?: movininTypes.User) => {
+    setUser(_user)
+
     const { state } = location
     if (!state) {
       setNoMatch(true)
@@ -111,6 +120,19 @@ const Property = () => {
         if (_property.price) {
           const _nightlyPrice = await PaymentService.convertPrice(_property.price)
           setNightlyPrice(_nightlyPrice)
+
+          // Fetch member discount info
+          try {
+            const percent = await DiscountService.getDiscountPercent()
+            setDiscountPercent(percent)
+
+            if (_user?.isMember && percent > 0) {
+              const discountedNightly = _nightlyPrice - Math.round((_nightlyPrice * percent) / 100)
+              setMemberNightlyPrice(discountedNightly)
+            }
+          } catch {
+            // Discount service unavailable is non-fatal
+          }
         }
       } else {
         setNoMatch(true)
@@ -158,7 +180,7 @@ const Property = () => {
   const isLongDescription = descriptionHtml.length > 300
 
   return (
-    <Layout onLoad={onLoad}>
+    <Layout onLoad={onLoad} strict={false}>
       {
         !loading && property && image
         && (
@@ -288,10 +310,38 @@ const Property = () => {
                       {/* Price per night header */}
                       {nightlyPrice > 0 && (
                         <div className="booking-widget-price">
-                          <span className="booking-widget-price-amount">
-                            {movininHelper.formatPrice(nightlyPrice, commonStrings.CURRENCY, language)}
-                          </span>
-                          <span className="booking-widget-price-unit">{strings.PER_NIGHT}</span>
+                          {user?.isMember && memberNightlyPrice > 0 ? (
+                            <div className="member-pricing">
+                              <div className="member-pricing-active">
+                                <MemberBadge discountPercent={discountPercent} />
+                                <span className="member-pricing-original">
+                                  {movininHelper.formatPrice(nightlyPrice, commonStrings.CURRENCY, language)}
+                                </span>
+                                <div className="member-pricing-discounted">
+                                  <span className="member-pricing-discounted-amount">
+                                    {movininHelper.formatPrice(memberNightlyPrice, commonStrings.CURRENCY, language)}
+                                  </span>
+                                  <span className="member-pricing-discounted-unit">{strings.PER_NIGHT}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <span className="booking-widget-price-amount">
+                                {movininHelper.formatPrice(nightlyPrice, commonStrings.CURRENCY, language)}
+                              </span>
+                              <span className="booking-widget-price-unit">{strings.PER_NIGHT}</span>
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {/* CTA for non-members */}
+                      {!user && discountPercent > 0 && (
+                        <div className="member-pricing-cta">
+                          <a href="/sign-in">
+                            {memberStrings.formatString(memberStrings.SIGN_IN_TO_SAVE, String(discountPercent))}
+                          </a>
                         </div>
                       )}
 
@@ -377,6 +427,7 @@ const Property = () => {
                           from={from}
                           to={to}
                           language={language}
+                          user={user}
                         />
                       )}
                     </div>

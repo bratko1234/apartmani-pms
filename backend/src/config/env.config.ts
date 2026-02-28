@@ -540,6 +540,9 @@ export interface User extends Document {
   payLater?: boolean
   customerId?: string
   expireAt?: Date
+  isMember?: boolean
+  memberSince?: Date
+  totalBookings?: number
 }
 
 /**
