@@ -8,6 +8,7 @@ import * as UserService from '@/services/UserService'
 import * as PaymentService from '@/services/PaymentService'
 import { strings as commonStrings } from '@/lang/common'
 import { strings } from '@/lang/properties'
+import { generateSlug } from '@/utils/seo'
 import PropertyInfo from '@/components/PropertyInfo'
 
 import '@/assets/css/property-component.css'
@@ -78,7 +79,7 @@ const Property = ({
   }
 
   const handleClick = () => {
-    navigate('/property', {
+    navigate(`/property/${property._id}/${generateSlug(property.name)}`, {
       state: {
         propertyId: property._id,
         from,

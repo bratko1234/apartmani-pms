@@ -36,6 +36,7 @@ import * as StripeService from '@/services/StripeService'
 import * as PayPalService from '@/services/PayPalService'
 import { useRecaptchaContext, RecaptchaContextType } from '@/context/RecaptchaContext'
 import Layout from '@/components/Layout'
+import SEO from '@/components/SEO'
 import Error from '@/components/Error'
 import DatePicker from '@/components/DatePicker'
 import NoMatch from './NoMatch'
@@ -404,6 +405,11 @@ const Checkout = () => {
 
   return (
     <Layout onLoad={onLoad} strict={false}>
+      <SEO
+        title="Potvrda rezervacije"
+        description="Završite vašu rezervaciju smještaja."
+        noindex
+      />
       {!user?.blacklisted && visible && property && from && to && location && (
         <>
           <div className="checkout">

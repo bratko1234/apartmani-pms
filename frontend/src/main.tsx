@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { HelmetProvider } from 'react-helmet-async'
 import { ToastContainer } from 'react-toastify'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -353,28 +354,22 @@ const theme = createTheme(
 )
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <ThemeProvider theme={theme}>
-    <CssBaseline>
-      <App />
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnFocusLoss={false}
-        draggable={false}
-        pauseOnHover
-        theme="dark"
-      />
-    </CssBaseline>
-    {/* <a
-      className="github-fork-ribbon fixed left-bottom"
-      href="https://github.com/aelassas/movinin"
-      data-ribbon="Fork me on GitHub"
-      title="Fork me on GitHub"
-    >
-      Fork me on GitHub
-    </a> */}
-  </ThemeProvider>,
+  <HelmetProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline>
+        <App />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnFocusLoss={false}
+          draggable={false}
+          pauseOnHover
+          theme="dark"
+        />
+      </CssBaseline>
+    </ThemeProvider>
+  </HelmetProvider>,
 )
