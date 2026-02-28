@@ -33,6 +33,8 @@ import ImageEditor from '@/components/ImageEditor'
 import RentalTermList from '@/components/RentalTermList'
 import PositionInput from '@/components/PositionInput'
 
+import { strings as rateStrings } from '@/lang/rate-management'
+
 import '@/assets/css/create-property.css'
 
 const UpdateProperty = () => {
@@ -677,6 +679,19 @@ const UpdateProperty = () => {
               <div className="buttons">
                 <Button type="submit" variant="contained" className="btn-primary btn-margin-bottom" size="small">
                   {commonStrings.SAVE}
+                </Button>
+                <Button
+                  variant="outlined"
+                  className="btn-margin-bottom"
+                  size="small"
+                  onClick={() => {
+                    const id = new URLSearchParams(window.location.search).get('p')
+                    if (id) {
+                      navigate(`/rate-management?p=${id}`)
+                    }
+                  }}
+                >
+                  {rateStrings.MANAGE_RATES}
                 </Button>
                 <Button
                   variant="contained"

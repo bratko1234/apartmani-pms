@@ -629,3 +629,110 @@ export interface MarkPayoutsPaidPayload {
   paymentMethod?: string
   notes?: string
 }
+
+//
+// Rate management types
+//
+export enum RateChannel {
+  All = 'all',
+  Direct = 'direct',
+  Ota = 'ota',
+}
+
+export enum DiscountType {
+  LastMinute = 'last_minute',
+  LongStayWeekly = 'long_stay_weekly',
+  LongStayMonthly = 'long_stay_monthly',
+  Member = 'member',
+}
+
+export enum DiscountChannel {
+  All = 'all',
+  Direct = 'direct',
+}
+
+export interface RateSeason {
+  _id?: string
+  property: string
+  name: string
+  startDate: Date | string
+  endDate: Date | string
+  nightlyRate: number
+  minStay: number
+  maxStay?: number
+  channel: RateChannel
+  active: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface RateDiscount {
+  _id?: string
+  property: string
+  type: DiscountType
+  discountPercent: number
+  daysBeforeCheckin?: number
+  minNights?: number
+  channelRestriction: DiscountChannel
+  active: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface DailyRate {
+  date: string
+  rate: number
+  seasonName?: string
+  minStay: number
+}
+
+export interface StayPriceResult {
+  totalPrice: number
+  nightlyBreakdown: DailyRate[]
+  averageNightlyRate: number
+  nights: number
+  discountApplied?: {
+    type: DiscountType
+    percent: number
+    savings: number
+  }
+  finalPrice: number
+}
+
+export interface CreateRateSeasonPayload {
+  property: string
+  name: string
+  startDate: string
+  endDate: string
+  nightlyRate: number
+  minStay?: number
+  maxStay?: number
+  channel?: RateChannel
+  active?: boolean
+}
+
+export interface UpdateRateSeasonPayload extends CreateRateSeasonPayload {
+  _id: string
+}
+
+export interface CreateRateDiscountPayload {
+  property: string
+  type: DiscountType
+  discountPercent: number
+  daysBeforeCheckin?: number
+  minNights?: number
+  channelRestriction?: DiscountChannel
+  active?: boolean
+}
+
+export interface UpdateRateDiscountPayload extends CreateRateDiscountPayload {
+  _id: string
+}
+
+export interface CalculateStayPricePayload {
+  propertyId: string
+  from: string
+  to: string
+  channel?: RateChannel
+  isMember?: boolean
+}

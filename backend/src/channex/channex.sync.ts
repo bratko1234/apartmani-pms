@@ -2,6 +2,7 @@ import * as movininTypes from ':movinin-types'
 import * as logger from '../utils/logger'
 import * as channexService from './channex.service'
 import * as channexMapper from './channex.mapper'
+import * as rateService from '../services/rateService'
 import Property from '../models/Property'
 import Booking from '../models/Booking'
 import LocationValue from '../models/LocationValue'
@@ -174,23 +175,40 @@ export const syncPropertyRates = async (
   }
 
   if (!rates || rates.length === 0) {
-    const property = await Property.findById(propertyId).lean()
-    if (!property) {
-      throw new Error(`Property ${propertyId} not found`)
-    }
-
-    const defaultRates: { date: string; rate: number }[] = []
-    const cursor = new Date()
+    const now = new Date()
     const end = new Date()
     end.setFullYear(end.getFullYear() + 1)
-    while (cursor <= end) {
-      defaultRates.push({
-        date: cursor.toISOString().split('T')[0],
-        rate: property.price,
-      })
-      cursor.setDate(cursor.getDate() + 1)
+
+    try {
+      const schedule = await rateService.getRateSchedule(
+        propertyId,
+        now,
+        end,
+        movininTypes.RateChannel.All,
+      )
+      rates = schedule.map((day) => ({
+        date: day.date,
+        rate: day.rate,
+        minStay: day.minStay,
+      }))
+    } catch (err) {
+      logger.error(`[channex.sync] Failed to get rate schedule for ${propertyId}, falling back to property price`, err)
+      const property = await Property.findById(propertyId).lean()
+      if (!property) {
+        throw new Error(`Property ${propertyId} not found`)
+      }
+
+      const defaultRates: { date: string; rate: number }[] = []
+      const cursor = new Date(now)
+      while (cursor <= end) {
+        defaultRates.push({
+          date: cursor.toISOString().split('T')[0],
+          rate: property.price,
+        })
+        cursor.setDate(cursor.getDate() + 1)
+      }
+      rates = defaultRates
     }
-    rates = defaultRates
   }
 
   const channexRates = channexMapper.ratesToChannex(ratePlanMapping.channexId, rates)
