@@ -225,11 +225,17 @@ const BookingList = ({
         field: 'renter',
         headerName: strings.RENTER,
         flex: 1,
-        renderCell: ({ row, value }: GridRenderCellParams<movininTypes.Booking, string>) => (
-          <Tooltip title={value} placement="left">
-            <Link href={`/user?u=${(row?.renter as movininTypes.User)._id}`}>{value}</Link>
-          </Tooltip>
-        ),
+        renderCell: ({ row, value }: GridRenderCellParams<movininTypes.Booking, string>) => {
+          const renterUser = row?.renter as movininTypes.User | undefined
+          if (!renterUser?._id) {
+            return <span>{(row as any)?.externalGuestName || '-'}</span>
+          }
+          return (
+            <Tooltip title={value} placement="left">
+              <Link href={`/user?u=${renterUser._id}`}>{value}</Link>
+            </Tooltip>
+          )
+        },
         valueGetter: (value: movininTypes.User) => value?.fullName,
       },
       {
@@ -518,7 +524,9 @@ const BookingList = ({
                     <div className="booking-detail" style={{ height: bookingDetailHeight }}>
                       <span className="booking-detail-title">{strings.RENTER}</span>
                       <div className="booking-detail-value">
-                        <Link href={`user/?u=${(booking.renter as movininTypes.User)._id}`}>{(booking.renter as movininTypes.User).fullName}</Link>
+                        {booking.renter
+                          ? <Link href={`user/?u=${(booking.renter as movininTypes.User)._id}`}>{(booking.renter as movininTypes.User).fullName}</Link>
+                          : <span>{(booking as any).externalGuestName || '-'}</span>}
                       </div>
                     </div>
                     <div className="booking-detail" style={{ height: bookingDetailHeight }}>

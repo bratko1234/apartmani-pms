@@ -14,7 +14,6 @@
 
 ### Poznati nedostaci iz Faze 1
 - Nema unit testova za novi kod (Channex servis, webhook, owner portal)
-- End-to-end tok oznacavanja izvora rezervacija treba verifikaciju
 
 ---
 
@@ -26,8 +25,11 @@
 | Ispravke agencija/vlasnika | Uklonjen avatar filter, AccountCircle fallback, vlasnici vidljivi svuda | ZAVRSENO | 2026-02-28 |
 | Dashboard sa grafikonima | Admin vidi sve vlasnike (agregirano + filter), agency vidi samo svoje | ZAVRSENO | 2026-02-28 |
 | UI za upravljanje cijenama | Sezonske cijene, popusti, property search fix ($in:[] bug) | ZAVRSENO | 2026-02-28 |
-| Modul za isplate vlasnicima | Mjesecni izvjestaji, odobrenje, oznacavanje placanja | CEKA | — |
-| Proslijedjivanje poruka gostiju | Channex → PMS → vlasnik | CEKA | — |
+| Channex distribucija | Pravi API format (api-key header), room type + rate plan kreiranje, ARI restrictions, Open Channel API, admin dashboard | ZAVRSENO | 2026-02-28 |
+| Modul za isplate vlasnicima | Model, servis, kontroler, admin UI. Generisanje, odobrenje, oznacavanje placanja | ZAVRSENO | 2026-03-01 |
+| Webhook E2E verifikacija | Airbnb + Booking.com booking tok, modifikacija, otkazivanje — sve verificirano | ZAVRSENO | 2026-03-01 |
+| Finansijski pipeline | OTA provizije (Airbnb 15.5%, Booking.com 15%), provizija za upravljanje (12%), neto obracun | ZAVRSENO | 2026-03-01 |
+| Proslijedjivanje poruka gostiju | Channex → PMS → vlasnik (webhook handler implementiran) | ZAVRSENO | 2026-03-01 |
 | SEO optimizacija | Schema.org, sitemap, SSR/SSG | CEKA | — |
 | Clansko snizenje | Loyalty popusti, samo za direktne | CEKA | — |
 
@@ -57,3 +59,4 @@
 | 2026-02-27 | d09dfbd | feat: implementacija Faze 1 MVP (109 fajlova) |
 | 2026-02-27 | d1defe6 | fix: ispravke TypeScript gresaka u owner portal stranicama |
 | 2026-02-28 | ee7abd2 | feat: seed data, admin ispravke, owner dashboard poboljsanja (21 fajl) |
+| 2026-03-01 | — | feat: E2E webhook verifikacija, finansijski pipeline, ispravke modela (renter opcioni, status mapiranje) |

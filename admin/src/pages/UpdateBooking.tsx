@@ -227,12 +227,6 @@ const UpdateBooking = () => {
                 return
               }
 
-              if (!_booking.renter) {
-                setLoading(false)
-                setNoMatch(true)
-                return
-              }
-
               setBooking(_booking)
               setPrice(_booking.price)
               setLoading(false)
@@ -245,12 +239,14 @@ const UpdateBooking = () => {
                 image: cmp.avatar,
               })
               setProperty(_booking.property as movininTypes.Property)
-              const rtn = _booking.renter as movininTypes.User
-              setRenter({
-                _id: rtn._id as string,
-                name: rtn.fullName,
-                image: rtn.avatar,
-              })
+              if (_booking.renter) {
+                const rtn = _booking.renter as movininTypes.User
+                setRenter({
+                  _id: rtn._id as string,
+                  name: rtn.fullName,
+                  image: rtn.avatar,
+                })
+              }
               const loc = _booking.location as movininTypes.Location
               setLocation({
                 _id: loc._id,

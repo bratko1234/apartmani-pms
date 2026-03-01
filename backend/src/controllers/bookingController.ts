@@ -299,28 +299,67 @@ export const checkout = async (req: Request, res: Response) => {
         await notify(user, booking._id.toString(), admin, message)
       }
 
-      // Push direct booking to Channex to block OTA calendars
+      // Push direct booking to Channex via Open Channel API to block OTA calendars
       if (channexService.isEnabled()) {
         try {
           const property = await Property.findById(booking.property)
           if (property) {
-            const mapping = await channexService.getMapping(
-              property._id.toString(),
-              movininTypes.ChannexMappingType.Property,
+            const propertyId = property._id.toString()
+            const roomTypeMapping = await channexService.getMapping(
+              propertyId,
+              movininTypes.ChannexMappingType.RoomType,
             )
-            if (mapping) {
-              const channexBookingId = await channexService.createBooking({
-                property_id: mapping.channexId,
-                arrival_date: booking.from.toISOString().split('T')[0],
-                departure_date: booking.to.toISOString().split('T')[0],
-                guest: {
-                  first_name: user.fullName.split(' ')[0] || user.fullName,
-                  last_name: user.fullName.split(' ').slice(1).join(' ') || '',
-                  email: user.email,
+            const ratePlanMapping = await channexService.getMapping(
+              propertyId,
+              movininTypes.ChannexMappingType.RatePlan,
+            )
+
+            if (roomTypeMapping && ratePlanMapping) {
+              const arrivalDate = booking.from.toISOString().split('T')[0]
+              const departureDate = booking.to.toISOString().split('T')[0]
+
+              // Build per-day price breakdown
+              const days: { date: string; price: number; rate_plan_code: string }[] = []
+              const cursor = new Date(booking.from)
+              const end = new Date(booking.to)
+              const nights = Math.max(1, Math.round((end.getTime() - cursor.getTime()) / (1000 * 60 * 60 * 24)))
+              const nightlyPrice = Math.round((booking.price / nights) * 100) / 100
+
+              while (cursor < end) {
+                days.push({
+                  date: cursor.toISOString().split('T')[0],
+                  price: nightlyPrice,
+                  rate_plan_code: ratePlanMapping.channexId,
+                })
+                cursor.setDate(cursor.getDate() + 1)
+              }
+
+              const firstName = user.fullName.split(' ')[0] || user.fullName
+              const lastName = user.fullName.split(' ').slice(1).join(' ') || ''
+
+              const channexBookingId = await channexService.createOpenChannelBooking({
+                booking: {
+                  status: 'new',
+                  provider_code: 'apartmani-pms',
+                  hotel_code: propertyId,
+                  reservation_id: booking._id.toString(),
+                  arrival_date: arrivalDate,
+                  departure_date: departureDate,
+                  currency: 'EUR',
+                  payment_collect: 'ota',
+                  payment_type: 'credit_card',
+                  customer: {
+                    name: firstName,
+                    surname: lastName,
+                    mail: user.email,
+                    phone: user.phone || '',
+                  },
+                  rooms: [{
+                    room_type_code: roomTypeMapping.channexId,
+                    occupancy: { adults: 2, children: 0, infants: 0 },
+                    days,
+                  }],
                 },
-                currency: 'EUR',
-                total_price: booking.price,
-                source: 'apartmani.ba',
               })
               if (channexBookingId) {
                 booking.channexBookingId = channexBookingId
@@ -496,7 +535,7 @@ export const update = async (req: Request, res: Response) => {
       booking.agency = new mongoose.Types.ObjectId(agency as string)
       booking.location = new mongoose.Types.ObjectId(location as string)
       booking.property = new mongoose.Types.ObjectId(property as string)
-      booking.renter = new mongoose.Types.ObjectId(renter as string)
+      booking.renter = renter ? new mongoose.Types.ObjectId(renter as string) : undefined
       booking.from = from
       booking.to = to
       booking.status = status
@@ -900,7 +939,7 @@ export const getBookings = async (req: Request, res: Response) => {
           as: 'renter',
         },
       },
-      { $unwind: { path: '$renter', preserveNullAndEmptyArrays: false } },
+      { $unwind: { path: '$renter', preserveNullAndEmptyArrays: true } },
       {
         $match,
       },
@@ -994,13 +1033,17 @@ export const cancelBooking = async (req: Request, res: Response) => {
         return
       }
       i18n.locale = agency.language
-      await notify(booking.renter, booking._id.toString().toString(), agency, i18n.t('CANCEL_BOOKING_NOTIFICATION'))
+      if (booking.renter) {
+        await notify(booking.renter, booking._id.toString().toString(), agency, i18n.t('CANCEL_BOOKING_NOTIFICATION'))
+      }
 
       // Notify admin
       const admin = !!env.ADMIN_EMAIL && (await User.findOne({ email: env.ADMIN_EMAIL, type: movininTypes.UserType.Admin }))
       if (admin) {
         i18n.locale = admin.language
-        await notify(booking.renter, booking._id.toString().toString(), admin, i18n.t('CANCEL_BOOKING_NOTIFICATION'))
+        if (booking.renter) {
+          await notify(booking.renter, booking._id.toString().toString(), admin, i18n.t('CANCEL_BOOKING_NOTIFICATION'))
+        }
       }
 
       res.sendStatus(200)
