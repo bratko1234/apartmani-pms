@@ -228,7 +228,23 @@ const BookingList = ({
         renderCell: ({ row, value }: GridRenderCellParams<movininTypes.Booking, string>) => {
           const renterUser = row?.renter as movininTypes.User | undefined
           if (!renterUser?._id) {
-            return <span>{(row as any)?.externalGuestName || '-'}</span>
+            const booking = row as movininTypes.Booking
+            const guestName = booking.externalGuestName || '-'
+            const contactParts: string[] = []
+            if (booking.externalGuestEmail) {
+              contactParts.push(booking.externalGuestEmail)
+            }
+            if (booking.externalGuestPhone) {
+              contactParts.push(booking.externalGuestPhone)
+            }
+            const tooltipText = contactParts.length > 0
+              ? `${guestName}\n${contactParts.join('\n')}`
+              : guestName
+            return (
+              <Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{tooltipText}</span>} placement="left">
+                <span>{guestName}</span>
+              </Tooltip>
+            )
           }
           return (
             <Tooltip title={value} placement="left">
@@ -526,7 +542,17 @@ const BookingList = ({
                       <div className="booking-detail-value">
                         {booking.renter
                           ? <Link href={`user/?u=${(booking.renter as movininTypes.User)._id}`}>{(booking.renter as movininTypes.User).fullName}</Link>
-                          : <span>{(booking as any).externalGuestName || '-'}</span>}
+                          : (
+                            <div>
+                              <span>{booking.externalGuestName || '-'}</span>
+                              {booking.externalGuestEmail && (
+                                <div style={{ fontSize: '0.85em', color: '#666' }}>{booking.externalGuestEmail}</div>
+                              )}
+                              {booking.externalGuestPhone && (
+                                <div style={{ fontSize: '0.85em', color: '#666' }}>{booking.externalGuestPhone}</div>
+                              )}
+                            </div>
+                          )}
                       </div>
                     </div>
                     <div className="booking-detail" style={{ height: bookingDetailHeight }}>

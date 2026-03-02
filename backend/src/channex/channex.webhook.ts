@@ -10,14 +10,19 @@ import ChannexMapping from '../models/ChannexMapping'
 import ChannexWebhookLog from '../models/ChannexWebhookLog'
 import Notification from '../models/Notification'
 import NotificationCounter from '../models/NotificationCounter'
+import Property from '../models/Property'
 import User from '../models/User'
 
 /**
- * Verify Channex webhook signature.
+ * Verify Channex webhook signature using HMAC-SHA256.
+ * Rejects all webhooks when the secret is not configured.
+ * Uses the raw request body (if available) for accurate HMAC computation.
+ * Falls back to JSON.stringify if rawBody is not captured.
  */
 export const verifySignature = (req: Request, res: Response, next: NextFunction): void => {
   if (!env.CHANNEX_WEBHOOK_SECRET) {
-    next()
+    logger.error('[channex.webhook] CHANNEX_WEBHOOK_SECRET not configured, rejecting webhook')
+    res.status(503).send({ message: 'Webhook verification not configured' })
     return
   }
 
@@ -27,13 +32,16 @@ export const verifySignature = (req: Request, res: Response, next: NextFunction)
     return
   }
 
-  const body = JSON.stringify(req.body)
+  const rawBody = (req as any).rawBody as Buffer | undefined
+  const body = rawBody || Buffer.from(JSON.stringify(req.body))
   const expectedSignature = crypto
     .createHmac('sha256', env.CHANNEX_WEBHOOK_SECRET)
     .update(body)
     .digest('hex')
 
-  if (signature !== expectedSignature) {
+  const sigBuffer = Buffer.from(signature)
+  const expectedBuffer = Buffer.from(expectedSignature)
+  if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
     logger.error('[channex.webhook] Invalid signature')
     res.status(401).send({ message: 'Invalid webhook signature' })
     return
@@ -87,7 +95,7 @@ export const handleWebhook = async (req: Request, res: Response): Promise<void> 
     await log.save()
 
     logger.error(`[channex.webhook] Error processing ${eventType}`, err)
-    res.status(500).send({ status: 'error', message: errorMessage })
+    res.status(200).send({ status: 'error_logged', message: 'Event logged with error' })
   }
 }
 
@@ -121,7 +129,7 @@ const handleNewBooking = async (payload: Record<string, unknown>): Promise<void>
   }
 
   const propertyId = mapping.internalId
-  const property = await (await import('../models/Property')).default.findById(propertyId)
+  const property = await Property.findById(propertyId)
   if (!property) {
     logger.error(`[channex.webhook] Property ${propertyId} not found`)
     return
@@ -139,6 +147,13 @@ const handleNewBooking = async (payload: Record<string, unknown>): Promise<void>
     channexBookingId: bookingData.channexBookingId,
     channexReservationId: bookingData.channexReservationId,
     externalGuestName: bookingData.externalGuestName,
+    externalGuestEmail: bookingData.externalGuestEmail,
+    externalGuestPhone: bookingData.externalGuestPhone,
+    externalGuestCountry: bookingData.externalGuestCountry,
+    externalGuestAddress: bookingData.externalGuestAddress,
+    externalGuestCity: bookingData.externalGuestCity,
+    externalGuestZip: bookingData.externalGuestZip,
+    externalGuestLanguage: bookingData.externalGuestLanguage,
   })
 
   await booking.save()
@@ -161,12 +176,28 @@ const handleBookingModification = async (payload: Record<string, unknown>): Prom
     return
   }
 
-  booking.from = bookingData.from
-  booking.to = bookingData.to
-  booking.price = bookingData.price
-  booking.status = bookingData.status
-  booking.externalGuestName = bookingData.externalGuestName
-  await booking.save()
+  const update: Record<string, unknown> = {
+    from: bookingData.from,
+    to: bookingData.to,
+    price: bookingData.price,
+    status: bookingData.status,
+    externalGuestName: bookingData.externalGuestName,
+  }
+
+  const contactFields = [
+    'externalGuestEmail', 'externalGuestPhone', 'externalGuestCountry',
+    'externalGuestAddress', 'externalGuestCity', 'externalGuestZip', 'externalGuestLanguage',
+  ] as const
+  for (const field of contactFields) {
+    if (bookingData[field] !== undefined) {
+      update[field] = bookingData[field]
+    }
+  }
+
+  await Booking.findOneAndUpdate(
+    { channexBookingId: bookingData.channexBookingId },
+    { $set: update },
+  )
 
   logger.info(`[channex.webhook] Booking ${booking._id} modified`)
   await notifyAgency(booking.agency.toString(), booking._id.toString(), 'OTA booking has been modified')
@@ -247,14 +278,11 @@ const notifyAgency = async (agencyId: string, bookingId: string, message: string
     })
     await notification.save()
 
-    let counter = await NotificationCounter.findOne({ user: agency._id })
-    if (counter && typeof counter.count !== 'undefined') {
-      counter.count += 1
-      await counter.save()
-    } else {
-      counter = new NotificationCounter({ user: agency._id, count: 1 })
-      await counter.save()
-    }
+    await NotificationCounter.findOneAndUpdate(
+      { user: agency._id },
+      { $inc: { count: 1 } },
+      { upsert: true },
+    )
   } catch (err) {
     logger.error(`[channex.webhook] Failed to notify agency ${agencyId}`, err)
   }

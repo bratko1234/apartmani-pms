@@ -513,6 +513,14 @@ export const CHANNEX_PROPERTY_GROUP_ID = __env__('MI_CHANNEX_PROPERTY_GROUP_ID',
 export const CHANNEX_ENABLED = helper.StringToBoolean(__env__('MI_CHANNEX_ENABLED', false, 'false'))
 
 /**
+ * Public backend URL for constructing externally-accessible image URLs.
+ * e.g. https://api.apartmani.ba or http://your-ngrok-url.ngrok.io
+ *
+ * @type {string}
+ */
+export const PUBLIC_BACKEND_URL = __env__('MI_PUBLIC_BACKEND_URL', false)
+
+/**
  * User Document.
  *
  * @export
@@ -601,6 +609,13 @@ export interface Booking extends Document {
   channexBookingId?: string
   channexReservationId?: string
   externalGuestName?: string
+  externalGuestEmail?: string
+  externalGuestPhone?: string
+  externalGuestCountry?: string
+  externalGuestAddress?: string
+  externalGuestCity?: string
+  externalGuestZip?: string
+  externalGuestLanguage?: string
 }
 
 /**

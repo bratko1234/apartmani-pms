@@ -93,6 +93,34 @@ const bookingSchema = new Schema<env.Booking>(
     externalGuestName: {
       type: String,
     },
+    externalGuestEmail: {
+      type: String,
+      maxlength: 254,
+    },
+    externalGuestPhone: {
+      type: String,
+      maxlength: 30,
+    },
+    externalGuestCountry: {
+      type: String,
+      maxlength: 3,
+    },
+    externalGuestAddress: {
+      type: String,
+      maxlength: 500,
+    },
+    externalGuestCity: {
+      type: String,
+      maxlength: 200,
+    },
+    externalGuestZip: {
+      type: String,
+      maxlength: 20,
+    },
+    externalGuestLanguage: {
+      type: String,
+      maxlength: 10,
+    },
     expireAt: {
       //
       // Bookings created from checkout with Stripe are temporary and

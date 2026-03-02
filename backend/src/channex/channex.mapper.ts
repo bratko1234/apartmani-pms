@@ -122,6 +122,13 @@ export const channexBookingToInternal = (
   channexBookingId: string
   channexReservationId?: string
   externalGuestName?: string
+  externalGuestEmail?: string
+  externalGuestPhone?: string
+  externalGuestCountry?: string
+  externalGuestAddress?: string
+  externalGuestCity?: string
+  externalGuestZip?: string
+  externalGuestLanguage?: string
   price: number
   status: movininTypes.BookingStatus
 } => {
@@ -129,6 +136,7 @@ export const channexBookingToInternal = (
   const arrival = attributes.arrival_date as string
   const departure = attributes.departure_date as string
   const otaName = (attributes.ota_name || attributes.source || '') as string
+  const guestContact = extractGuestContact(attributes)
 
   return {
     from: new Date(arrival),
@@ -137,6 +145,7 @@ export const channexBookingToInternal = (
     channexBookingId: (channexBooking.id || attributes.id || '') as string,
     channexReservationId: (attributes.reservation_id || '') as string,
     externalGuestName: extractGuestName(attributes),
+    ...guestContact,
     price: Number(attributes.total_price || attributes.amount || 0),
     status: mapChannexStatus(attributes.status as string),
   }
@@ -228,6 +237,100 @@ const extractGuestName = (attributes: Record<string, unknown>): string => {
     const last = (guest.last_name || '') as string
     return `${first} ${last}`.trim()
   }
+  const customer = attributes.customer as Record<string, unknown> | undefined
+  if (customer) {
+    const name = (customer.name || '') as string
+    const surname = (customer.surname || '') as string
+    return `${name} ${surname}`.trim()
+  }
   return (attributes.guest_name || '') as string
+}
+
+/**
+ * Sanitize and length-cap a string value from external input.
+ */
+const sanitizeStr = (val: unknown, maxLen: number): string | undefined => {
+  if (typeof val !== 'string') {
+    return undefined
+  }
+  const trimmed = val.trim()
+  if (trimmed.length === 0 || trimmed.length > maxLen) {
+    return undefined
+  }
+  return trimmed
+}
+
+/**
+ * Validate an email address from external input.
+ */
+const validateEmail = (val: unknown): string | undefined => {
+  const s = sanitizeStr(val, 254)
+  if (s && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) {
+    return s
+  }
+  return undefined
+}
+
+/**
+ * Extract guest contact info from Channex payload.
+ * Handles two naming patterns:
+ * - Webhook/Booking Revision: guest.email, guest.phone, guest.country, etc.
+ * - Bookings API: customer.mail, customer.phone, customer.country, etc.
+ */
+const extractGuestContact = (attributes: Record<string, unknown>): {
+  externalGuestEmail?: string
+  externalGuestPhone?: string
+  externalGuestCountry?: string
+  externalGuestAddress?: string
+  externalGuestCity?: string
+  externalGuestZip?: string
+  externalGuestLanguage?: string
+} => {
+  const guest = attributes.guest as Record<string, unknown> | undefined
+  const customer = attributes.customer as Record<string, unknown> | undefined
+  const source = guest || customer
+
+  if (!source) {
+    return {}
+  }
+
+  const result: Record<string, string | undefined> = {}
+
+  const email = validateEmail(source.email) || validateEmail(source.mail)
+  if (email) {
+    result.externalGuestEmail = email
+  }
+
+  const phone = sanitizeStr(source.phone, 30)
+  if (phone) {
+    result.externalGuestPhone = phone
+  }
+
+  const country = sanitizeStr(source.country, 3)
+  if (country) {
+    result.externalGuestCountry = country
+  }
+
+  const address = sanitizeStr(source.address, 500)
+  if (address) {
+    result.externalGuestAddress = address
+  }
+
+  const city = sanitizeStr(source.city, 200)
+  if (city) {
+    result.externalGuestCity = city
+  }
+
+  const zip = sanitizeStr(source.zip_code, 20) || sanitizeStr(source.zip, 20)
+  if (zip) {
+    result.externalGuestZip = zip
+  }
+
+  const language = sanitizeStr(source.language, 10)
+  if (language) {
+    result.externalGuestLanguage = language
+  }
+
+  return result
 }
 

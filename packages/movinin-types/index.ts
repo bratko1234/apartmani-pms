@@ -153,6 +153,13 @@ export interface Booking {
   channexBookingId?: string
   channexReservationId?: string
   externalGuestName?: string
+  externalGuestEmail?: string
+  externalGuestPhone?: string
+  externalGuestCountry?: string
+  externalGuestAddress?: string
+  externalGuestCity?: string
+  externalGuestZip?: string
+  externalGuestLanguage?: string
 }
 
 export interface CheckoutPayload {
