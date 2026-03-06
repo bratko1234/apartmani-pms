@@ -20,6 +20,13 @@ import * as logger from '../utils/logger'
 import stripeAPI from '../payment/stripe'
 import * as channexService from '../channex/channex.service'
 import * as channexMapper from '../channex/channex.mapper'
+import * as channexSync from '../channex/channex.sync'
+
+const syncAvailabilityAfterBookingChange = (propertyId: string): void => {
+  channexSync.syncPropertyAvailability(propertyId).catch((err) => {
+    logger.error(`[booking] Channex availability sync failed for ${propertyId}`, err)
+  })
+}
 
 /**
  * Create a Booking.
@@ -36,6 +43,9 @@ export const create = async (req: Request, res: Response) => {
     const booking = new Booking(body)
 
     await booking.save()
+    if (body.property) {
+      syncAvailabilityAfterBookingChange(body.property as string)
+    }
     res.json(booking)
   } catch (err) {
     logger.error(`[booking.create] ${i18n.t('ERROR')} ${JSON.stringify(req.body)}`, err)
@@ -172,27 +182,46 @@ export const checkout = async (req: Request, res: Response) => {
     }
 
     if (renter) {
-      renter.verified = false
-      renter.blacklisted = false
+      // Check if a user with this email already exists
+      const existingUser = await User.findOne({ email: renter.email })
 
-      user = new User(renter)
-      await user.save()
+      if (existingUser) {
+        user = existingUser
+        // Update name/phone if provided
+        if (renter.fullName) {
+          existingUser.fullName = renter.fullName
+        }
+        if (renter.phone) {
+          existingUser.phone = renter.phone
+        }
+        await existingUser.save()
+      } else {
+        renter.verified = false
+        renter.blacklisted = false
 
-      const token = new Token({ user: user._id, token: helper.generateToken() })
-      await token.save()
+        user = new User(renter)
+        await user.save()
 
-      i18n.locale = user.language
+        const token = new Token({ user: user._id, token: helper.generateToken() })
+        await token.save()
 
-      const mailOptions: nodemailer.SendMailOptions = {
-        from: env.SMTP_FROM,
-        to: user.email,
-        subject: i18n.t('ACCOUNT_ACTIVATION_SUBJECT'),
-        html: `<p>${i18n.t('HELLO')}${user.fullName},<br><br>
-        ${i18n.t('ACCOUNT_ACTIVATION_LINK')}<br><br>
-        ${helper.joinURL(env.FRONTEND_HOST, 'activate')}/?u=${encodeURIComponent(user._id.toString())}&e=${encodeURIComponent(user.email)}&t=${encodeURIComponent(token.token)}<br><br>
-        ${i18n.t('REGARDS')}<br></p>`,
+        i18n.locale = user.language
+
+        try {
+          const mailOptions: nodemailer.SendMailOptions = {
+            from: env.SMTP_FROM,
+            to: user.email,
+            subject: i18n.t('ACCOUNT_ACTIVATION_SUBJECT'),
+            html: `<p>${i18n.t('HELLO')}${user.fullName},<br><br>
+            ${i18n.t('ACCOUNT_ACTIVATION_LINK')}<br><br>
+            ${helper.joinURL(env.FRONTEND_HOST, 'activate')}/?u=${encodeURIComponent(user._id.toString())}&e=${encodeURIComponent(user.email)}&t=${encodeURIComponent(token.token)}<br><br>
+            ${i18n.t('REGARDS')}<br></p>`,
+          }
+          await mailHelper.sendMail(mailOptions)
+        } catch (mailErr) {
+          logger.error('[booking.checkout] Failed to send activation email (non-blocking)', mailErr)
+        }
       }
-      await mailHelper.sendMail(mailOptions)
 
       body.booking.renter = user._id.toString()
     } else {
@@ -262,7 +291,9 @@ export const checkout = async (req: Request, res: Response) => {
     const { language } = user
     i18n.locale = language
 
-    body.booking.source = movininTypes.BookingSource.Direct
+    body.booking.source = body.booking.source === movininTypes.BookingSource.Widget
+      ? movininTypes.BookingSource.Widget
+      : movininTypes.BookingSource.Direct
     const booking = new Booking(body.booking)
 
     await booking.save()
@@ -274,29 +305,25 @@ export const checkout = async (req: Request, res: Response) => {
         { $inc: { totalBookings: 1 } },
       )
 
-      // Send confirmation email
-      if (!(await confirm(user, booking, body.payLater!))) {
-        res.sendStatus(400)
-        return
-      }
+      // Send notifications (non-blocking — don't fail the booking if email is down)
+      try {
+        await confirm(user, booking, body.payLater!)
 
-      // Notify agency
-      const agency = await User.findById(booking.agency)
-      if (!agency) {
-        logger.info(`Agency ${booking.agency} not found`)
-        res.sendStatus(204)
-        return
-      }
-      i18n.locale = agency.language
-      let message = body.payLater ? i18n.t('BOOKING_PAY_LATER_NOTIFICATION') : i18n.t('BOOKING_PAID_NOTIFICATION')
-      await notify(user, booking._id.toString(), agency, message)
+        const agency = await User.findById(booking.agency)
+        if (agency) {
+          i18n.locale = agency.language
+          const message = body.payLater ? i18n.t('BOOKING_PAY_LATER_NOTIFICATION') : i18n.t('BOOKING_PAID_NOTIFICATION')
+          await notify(user, booking._id.toString(), agency, message)
+        }
 
-      // Notify admin
-      const admin = !!env.ADMIN_EMAIL && (await User.findOne({ email: env.ADMIN_EMAIL, type: movininTypes.UserType.Admin }))
-      if (admin) {
-        i18n.locale = admin.language
-        message = body.payLater ? i18n.t('BOOKING_PAY_LATER_NOTIFICATION') : i18n.t('BOOKING_PAID_NOTIFICATION')
-        await notify(user, booking._id.toString(), admin, message)
+        const admin = !!env.ADMIN_EMAIL && (await User.findOne({ email: env.ADMIN_EMAIL, type: movininTypes.UserType.Admin }))
+        if (admin) {
+          i18n.locale = admin.language
+          const message = body.payLater ? i18n.t('BOOKING_PAY_LATER_NOTIFICATION') : i18n.t('BOOKING_PAID_NOTIFICATION')
+          await notify(user, booking._id.toString(), admin, message)
+        }
+      } catch (notifyErr) {
+        logger.error('[booking.checkout] Email notifications failed (non-blocking)', notifyErr)
       }
 
       // Push direct booking to Channex via Open Channel API to block OTA calendars
@@ -535,7 +562,7 @@ export const update = async (req: Request, res: Response) => {
       booking.agency = new mongoose.Types.ObjectId(agency as string)
       booking.location = new mongoose.Types.ObjectId(location as string)
       booking.property = new mongoose.Types.ObjectId(property as string)
-      booking.renter = renter ? new mongoose.Types.ObjectId(renter as string) : undefined
+      booking.renter = renter ? new mongoose.Types.ObjectId(renter as string) : undefined as unknown as mongoose.Types.ObjectId
       booking.from = from
       booking.to = to
       booking.status = status
@@ -543,6 +570,7 @@ export const update = async (req: Request, res: Response) => {
       booking.price = price as number
 
       await booking.save()
+      syncAvailabilityAfterBookingChange(booking.property.toString())
 
       if (previousStatus !== status) {
         // notify renter
@@ -581,9 +609,15 @@ export const updateStatus = async (req: Request, res: Response) => {
     bulk.find({ _id: { $in: ids } }).update({ $set: { status } })
     await bulk.execute()
 
+    const syncedProperties = new Set<string>()
     for (const booking of bookings) {
       if (booking.status !== status) {
         await notifyRenter(booking)
+      }
+      const pid = booking.property.toString()
+      if (!syncedProperties.has(pid)) {
+        syncedProperties.add(pid)
+        syncAvailabilityAfterBookingChange(pid)
       }
     }
 
@@ -623,6 +657,7 @@ export const deleteBookings = async (req: Request, res: Response) => {
           continue
         }
         // end of security check
+        syncAvailabilityAfterBookingChange(booking.property.toString())
         await booking.deleteOne()
       }
     }

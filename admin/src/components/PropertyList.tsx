@@ -287,11 +287,17 @@ const PropertyList = ({
                 <article key={property._id}>
 
                   <div className="left-panel">
-                    <img
-                      src={movininHelper.joinURL(env.CDN_PROPERTIES, property.image)}
-                      alt={property.name}
-                      className="property-img"
-                    />
+                    {property.image ? (
+                      <img
+                        src={movininHelper.joinURL(env.CDN_PROPERTIES, property.image)}
+                        alt={property.name}
+                        className="property-img"
+                      />
+                    ) : (
+                      <div className="property-img" style={{ backgroundColor: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span>{property.name.charAt(0)}</span>
+                      </div>
+                    )}
                     {!hideAgency && <AgencyBadge agency={property.agency} />}
                   </div>
 

@@ -135,7 +135,7 @@ const PropertyBookings = () => {
           <div className="col-1">
             <section className="property-sec">
               <div className="property-img">
-                <img alt="" src={movininHelper.joinURL(env.CDN_PROPERTIES, property.image)} />
+                {property.image && <img alt="" src={movininHelper.joinURL(env.CDN_PROPERTIES, property.image)} />}
               </div>
               <div className="agency">
                 <AgencyBadge agency={property.agency} />

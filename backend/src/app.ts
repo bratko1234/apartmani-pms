@@ -29,10 +29,18 @@ import * as helper from './utils/helper'
 
 const app = express()
 
-app.use(helmet.contentSecurityPolicy())
+const frameAncestors = env.WIDGET_HOSTS.length > 0
+  ? ["'self'", ...env.WIDGET_HOSTS]
+  : ["'self'"]
+
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    'frame-ancestors': frameAncestors,
+  },
+}))
 app.use(helmet.dnsPrefetchControl())
 app.use(helmet.crossOriginEmbedderPolicy())
-app.use(helmet.frameguard())
+// frameguard replaced by CSP frame-ancestors above for widget iframe support
 app.use(helmet.hidePoweredBy())
 app.use(helmet.hsts())
 app.use(helmet.ieNoOpen())

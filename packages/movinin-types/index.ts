@@ -17,6 +17,9 @@ export enum PropertyType {
   Industrial = 'INDUSTRIAL',
   Plot = 'PLOT',
   Townhouse = 'TOWNHOUSE',
+  Hotel = 'HOTEL',
+  Hostel = 'HOSTEL',
+  Resort = 'RESORT',
 }
 
 export enum BookingStatus {
@@ -52,6 +55,7 @@ export enum RentalTerm {
 export enum PaymentGateway {
   PayPal = 'payPal',
   Stripe = 'stripe',
+  Monri = 'monri',
 }
 
 export enum BookingSource {
@@ -59,6 +63,7 @@ export enum BookingSource {
   Airbnb = 'AIRBNB',
   BookingCom = 'BOOKING_COM',
   Expedia = 'EXPEDIA',
+  Widget = 'WIDGET',
   Other = 'OTHER',
 }
 
@@ -359,6 +364,9 @@ export interface Property {
   cancellation: number
   rentalTerm: RentalTerm
   blockOnPay?: boolean
+  parentProperty?: string | Property
+  countOfRooms?: number
+  isBuilding?: boolean
   [propKey: string]: any
 }
 
@@ -388,6 +396,9 @@ export interface CreatePropertyPayload {
   cancellation: number
   rentalTerm: string
   blockOnPay?: boolean
+  parentProperty?: string
+  countOfRooms?: number
+  isBuilding?: boolean
 }
 
 export interface UpdatePropertyPayload extends CreatePropertyPayload {
@@ -629,6 +640,32 @@ export interface OwnerPayout {
   notes?: string
   createdAt?: Date
   updatedAt?: Date
+}
+
+//
+// Building occupancy types
+//
+export interface RoomTypeWithOccupancy {
+  _id: string
+  name: string
+  type: PropertyType
+  price: number
+  countOfRooms: number
+  occupiedRooms: number
+  freeRooms: number
+  available: boolean
+}
+
+export interface BuildingWithOccupancy {
+  _id: string
+  name: string
+  image?: string
+  agency: { _id: string; fullName: string; avatar?: string }
+  location: Location
+  totalRooms: number
+  occupiedRooms: number
+  freeRooms: number
+  roomTypes: RoomTypeWithOccupancy[]
 }
 
 export interface GetPayoutsQuery {

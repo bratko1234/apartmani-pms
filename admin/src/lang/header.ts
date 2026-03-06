@@ -24,6 +24,9 @@ const strings = new LocalizedStrings({
     RATE_MANAGEMENT: 'Gestion des tarifs',
     MESSAGES: 'Messages',
     STATEMENTS: 'Relevés',
+    BUILDINGS: 'Bâtiments',
+    CHANNEX: 'Channex',
+    WIDGET_EMBED: 'Widget',
   },
   en: {
     DASHBOARD: 'Dashboard',
@@ -47,6 +50,9 @@ const strings = new LocalizedStrings({
     RATE_MANAGEMENT: 'Rate Management',
     MESSAGES: 'Messages',
     STATEMENTS: 'Statements',
+    BUILDINGS: 'Buildings',
+    CHANNEX: 'Channex',
+    WIDGET_EMBED: 'Widget',
   },
   sr: {
     DASHBOARD: 'Kontrolna tabla',
@@ -70,6 +76,9 @@ const strings = new LocalizedStrings({
     RATE_MANAGEMENT: 'Upravljanje cijenama',
     MESSAGES: 'Poruke',
     STATEMENTS: 'Izvještaji',
+    BUILDINGS: 'Zgrade',
+    CHANNEX: 'Channex',
+    WIDGET_EMBED: 'Widget',
   },
 })
 

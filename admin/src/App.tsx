@@ -50,6 +50,9 @@ const PayoutDetail = lazy(() => import('@/pages/PayoutDetail'))
 const OwnerPayouts = lazy(() => import('@/pages/OwnerPayouts'))
 const RateManagement = lazy(() => import('@/pages/RateManagement'))
 const MessageThread = lazy(() => import('@/pages/MessageThread'))
+const ChannexDashboard = lazy(() => import('@/pages/ChannexDashboard'))
+const WidgetEmbed = lazy(() => import('@/pages/WidgetEmbed'))
+const Buildings = lazy(() => import('@/pages/Buildings'))
 
 const AppLayout = () => {
   const location = useLocation()
@@ -123,6 +126,9 @@ const router = createBrowserRouter([
       { path: '/owner-payouts', element: <OwnerPayouts /> },
       { path: '/rate-management', element: <RateManagement /> },
       { path: '/messages', element: <MessageThread /> },
+      { path: '/channex', element: <ChannexDashboard /> },
+      { path: '/widget-embed', element: <WidgetEmbed /> },
+      { path: '/buildings', element: <Buildings /> },
       { path: '*', element: <NoMatch /> }
     ]
   }

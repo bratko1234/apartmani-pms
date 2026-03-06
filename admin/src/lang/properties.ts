@@ -41,6 +41,9 @@ const strings = new LocalizedStrings({
     YEARS: 'ans',
     VIEW_BOOKINGS: 'Voir les réservations',
     PETS_ALLOWED_TOOLTIP: 'Animaux domestiques autorisés',
+    HOTEL: 'Hôtel',
+    HOSTEL: 'Auberge',
+    RESORT: 'Resort',
   },
   en: {
     NEW_PROPERTY: 'New property',
@@ -81,6 +84,9 @@ const strings = new LocalizedStrings({
     YEARS: 'years',
     VIEW_BOOKINGS: 'View bookings',
     PETS_ALLOWED_TOOLTIP: 'Pets allowed',
+    HOTEL: 'Hotel',
+    HOSTEL: 'Hostel',
+    RESORT: 'Resort',
   },
   sr: {
     NEW_PROPERTY: 'Nova nekretnina',
@@ -121,6 +127,9 @@ const strings = new LocalizedStrings({
     YEARS: 'godina',
     VIEW_BOOKINGS: 'Pogledaj rezervacije',
     PETS_ALLOWED_TOOLTIP: 'Kućni ljubimci dozvoljeni',
+    HOTEL: 'Hotel',
+    HOSTEL: 'Hostel',
+    RESORT: 'Odmaralište',
   },
 })
 

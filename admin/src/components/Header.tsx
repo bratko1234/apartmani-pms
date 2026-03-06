@@ -39,6 +39,9 @@ import {
   TrendingUp as RateManagementIcon,
   Chat as MessagesIcon,
   AccountBalanceWallet as StatementsIcon,
+  Hub as ChannexIcon,
+  Code as WidgetIcon,
+  Apartment as BuildingsIcon,
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as movininTypes from ':movinin-types'
@@ -376,6 +379,24 @@ const Header = ({
                     </ListItem>
                     <ListItem
                       onClick={() => {
+                        navigate('/channex')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><ChannexIcon /></ListItemIcon>
+                      <ListItemText primary={strings.CHANNEX} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/widget-embed')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><WidgetIcon /></ListItemIcon>
+                      <ListItemText primary={strings.WIDGET_EMBED} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
                         navigate('/agencies')
                         handleSideMenuClose()
                       }}
@@ -413,6 +434,15 @@ const Header = ({
                 >
                   <ListItemIcon><PropertiesIcon /></ListItemIcon>
                   <ListItemText primary={strings.PROPERTIES} />
+                </ListItem>
+                <ListItem
+                  onClick={() => {
+                    navigate('/buildings')
+                    handleSideMenuClose()
+                  }}
+                >
+                  <ListItemIcon><BuildingsIcon /></ListItemIcon>
+                  <ListItemText primary={strings.BUILDINGS} />
                 </ListItem>
                 {user?.type === movininTypes.UserType.Admin && (
                   <ListItem

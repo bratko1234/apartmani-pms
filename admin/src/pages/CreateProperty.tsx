@@ -8,7 +8,9 @@ import {
   FormControlLabel,
   Switch,
   TextField,
-  FormHelperText
+  FormHelperText,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Editor } from 'react-draft-wysiwyg'
@@ -74,6 +76,10 @@ const CreateProperty = () => {
   const [longitude, setLongitude] = useState('')
   const [loading, setLoading] = useState(false)
   const [blockOnPay, setBlockOnPay] = useState(true)
+  const [isBuilding, setIsBuilding] = useState(false)
+  const [parentProperty, setParentProperty] = useState('')
+  const [countOfRooms, setCountOfRooms] = useState('1')
+  const [buildings, setBuildings] = useState<{ _id: string; name: string }[]>([])
 
   const createPropertyRef = useRef<HTMLDivElement>(null)
 
@@ -234,7 +240,7 @@ const CreateProperty = () => {
 
       setLoading(true)
 
-      const data = {
+      const data: movininTypes.CreatePropertyPayload = {
         name,
         agency,
         type,
@@ -260,6 +266,9 @@ const CreateProperty = () => {
         available,
         rentalTerm,
         blockOnPay,
+        isBuilding,
+        parentProperty: parentProperty || undefined,
+        countOfRooms: parentProperty ? Number.parseInt(countOfRooms, 10) : 1,
       }
 
       const property = await PropertyService.create(data)
@@ -276,7 +285,7 @@ const CreateProperty = () => {
     }
   }
 
-  const onLoad = (_user?: movininTypes.User) => {
+  const onLoad = async (_user?: movininTypes.User) => {
     if (_user && _user.verified) {
       setUser(_user)
       setVisible(true)
@@ -284,6 +293,34 @@ const CreateProperty = () => {
       if (_user.type === movininTypes.RecordType.Agency) {
         setAgency(_user._id as string)
         setIsAgency(true)
+      }
+
+      try {
+        const agencyFilter = _user.type === movininTypes.RecordType.Agency ? _user._id : undefined
+        const _buildings = await PropertyService.getBuildings(agencyFilter)
+        setBuildings(_buildings)
+
+        // Auto-fill parent from URL query param
+        const params = new URLSearchParams(window.location.search)
+        const parentId = params.get('parent')
+        if (parentId) {
+          setParentProperty(parentId)
+          try {
+            const parentData = await PropertyService.getProperty(parentId)
+            if (parentData) {
+              if (parentData.agency) {
+                setAgency(parentData.agency._id as string)
+              }
+              if (parentData.location) {
+                setLocation({ _id: parentData.location._id, name: parentData.location.name })
+              }
+            }
+          } catch {
+            // Parent data fetch is non-critical
+          }
+        }
+      } catch {
+        // Buildings list is non-critical
       }
     }
   }
@@ -349,6 +386,7 @@ const CreateProperty = () => {
                 label={strings.LOCATION}
                 required
                 variant="standard"
+                value={location}
                 onChange={handleLocationChange}
               />
             </FormControl>
@@ -460,6 +498,56 @@ const CreateProperty = () => {
                 className="checkbox-fcl"
               />
             </FormControl>
+
+            <FormControl fullWidth margin="dense" className="checkbox-fc">
+              <FormControlLabel
+                control={(
+                  <Switch
+                    checked={isBuilding}
+                    onChange={(e) => {
+                      setIsBuilding(e.target.checked)
+                      if (e.target.checked) {
+                        setParentProperty('')
+                        setCountOfRooms('1')
+                      }
+                    }}
+                    color="primary"
+                  />
+                )}
+                label={strings.IS_BUILDING}
+                className="checkbox-fcl"
+              />
+            </FormControl>
+
+            {!isBuilding && buildings.length > 0 && (
+              <FormControl fullWidth margin="dense">
+                <InputLabel>{strings.PARENT_PROPERTY}</InputLabel>
+                <Select
+                  label={strings.PARENT_PROPERTY}
+                  value={parentProperty}
+                  onChange={(e) => setParentProperty(e.target.value)}
+                  variant="standard"
+                >
+                  <MenuItem value="">{strings.NO_PARENT}</MenuItem>
+                  {buildings.map((b) => (
+                    <MenuItem key={b._id} value={b._id}>{b.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
+
+            {!isBuilding && parentProperty && (
+              <FormControl fullWidth margin="dense">
+                <InputLabel>{strings.COUNT_OF_ROOMS}</InputLabel>
+                <Input
+                  type="text"
+                  value={countOfRooms}
+                  autoComplete="off"
+                  onChange={(e) => setCountOfRooms(e.target.value)}
+                  inputProps={{ inputMode: 'numeric', pattern: '^\\d{1,3}$' }}
+                />
+              </FormControl>
+            )}
 
             <FormControl fullWidth margin="dense" className="editor-field">
               <span className="label required">{strings.DESCRIPTION}</span>

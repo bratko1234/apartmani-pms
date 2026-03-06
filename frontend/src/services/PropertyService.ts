@@ -63,3 +63,11 @@ export const getBookingProperties = (keyword: string, data: movininTypes.GetBook
       { withCredentials: true }
     )
     .then((res) => res.data)
+
+/**
+ * Get room types (children) of a building property.
+ */
+export const getRoomTypes = (buildingId: string): Promise<movininTypes.Property[]> =>
+  axiosInstance
+    .get(`/api/property-room-types/${encodeURIComponent(buildingId)}`)
+    .then((res) => res.data)

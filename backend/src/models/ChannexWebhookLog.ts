@@ -41,6 +41,8 @@ const channexWebhookLogSchema = new Schema<ChannexWebhookLogDocument>(
   },
 )
 
+channexWebhookLogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 })
+
 const ChannexWebhookLog = model<ChannexWebhookLogDocument>('ChannexWebhookLog', channexWebhookLogSchema)
 
 export default ChannexWebhookLog

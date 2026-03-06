@@ -8,8 +8,18 @@ import {
   FormControlLabel,
   Switch,
   TextField,
-  FormHelperText
+  FormHelperText,
+  Select,
+  MenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
 } from '@mui/material'
+import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { Editor } from 'react-draft-wysiwyg'
 import { EditorState, convertToRaw, ContentState } from 'draft-js'
@@ -81,6 +91,11 @@ const UpdateProperty = () => {
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
   const [blockOnPay, setBlockOnPay] = useState(true)
+  const [isBuilding, setIsBuilding] = useState(false)
+  const [parentProperty, setParentProperty] = useState('')
+  const [countOfRooms, setCountOfRooms] = useState('1')
+  const [buildings, setBuildings] = useState<{ _id: string; name: string }[]>([])
+  const [roomTypes, setRoomTypes] = useState<movininTypes.Property[]>([])
 
   const createPropertyRef = useRef<HTMLDivElement>(null)
 
@@ -236,7 +251,7 @@ const UpdateProperty = () => {
         return
       }
 
-      const data = {
+      const data: movininTypes.UpdatePropertyPayload = {
         _id: property._id,
         name,
         agency: agency._id,
@@ -263,6 +278,9 @@ const UpdateProperty = () => {
         available,
         rentalTerm,
         blockOnPay,
+        isBuilding,
+        parentProperty: parentProperty || undefined,
+        countOfRooms: parentProperty ? Number.parseInt(countOfRooms, 10) : 1,
       }
 
       const status = await PropertyService.update(data)
@@ -281,6 +299,14 @@ const UpdateProperty = () => {
     if (_user && _user.verified) {
       setLoading(true)
       setUser(_user)
+
+      try {
+        const agencyFilter = _user.type === movininTypes.RecordType.Agency ? _user._id : undefined
+        const _buildings = await PropertyService.getBuildings(agencyFilter)
+        setBuildings(_buildings)
+      } catch {
+        // Buildings list is non-critical
+      }
 
       const params = new URLSearchParams(window.location.search)
       if (params.has('p')) {
@@ -334,6 +360,21 @@ const UpdateProperty = () => {
               setCancellation(movininHelper.extraToString(_property.cancellation))
               setAvailable(_property.available)
               setBlockOnPay(_property.blockOnPay || false)
+              setIsBuilding(_property.isBuilding || false)
+              setCountOfRooms((_property.countOfRooms || 1).toString())
+              const parentId = typeof _property.parentProperty === 'string'
+                ? _property.parentProperty
+                : (_property.parentProperty as movininTypes.Property)?._id || ''
+              setParentProperty(parentId)
+
+              if (_property.isBuilding) {
+                try {
+                  const _roomTypes = await PropertyService.getRoomTypes(_property._id)
+                  setRoomTypes(_roomTypes)
+                } catch {
+                  // Room types fetch is non-critical
+                }
+              }
 
               setVisible(true)
               setLoading(false)
@@ -535,6 +576,58 @@ const UpdateProperty = () => {
                 />
               </FormControl>
 
+              <FormControl fullWidth margin="dense" className="checkbox-fc">
+                <FormControlLabel
+                  control={(
+                    <Switch
+                      checked={isBuilding}
+                      onChange={(e) => {
+                        setIsBuilding(e.target.checked)
+                        if (e.target.checked) {
+                          setParentProperty('')
+                          setCountOfRooms('1')
+                        }
+                      }}
+                      color="primary"
+                    />
+                  )}
+                  label={strings.IS_BUILDING}
+                  className="checkbox-fcl"
+                />
+              </FormControl>
+
+              {!isBuilding && buildings.length > 0 && (
+                <FormControl fullWidth margin="dense">
+                  <InputLabel>{strings.PARENT_PROPERTY}</InputLabel>
+                  <Select
+                    label={strings.PARENT_PROPERTY}
+                    value={parentProperty}
+                    onChange={(e) => setParentProperty(e.target.value)}
+                    variant="standard"
+                  >
+                    <MenuItem value="">{strings.NO_PARENT}</MenuItem>
+                    {buildings
+                      .filter((b) => b._id !== property?._id)
+                      .map((b) => (
+                        <MenuItem key={b._id} value={b._id}>{b.name}</MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
+              )}
+
+              {!isBuilding && parentProperty && (
+                <FormControl fullWidth margin="dense">
+                  <InputLabel>{strings.COUNT_OF_ROOMS}</InputLabel>
+                  <Input
+                    type="text"
+                    value={countOfRooms}
+                    autoComplete="off"
+                    onChange={(e) => setCountOfRooms(e.target.value)}
+                    inputProps={{ inputMode: 'numeric', pattern: '^\\d{1,3}$' }}
+                  />
+                </FormControl>
+              )}
+
               <FormControl fullWidth margin="dense" className="editor-field">
                 <span className="label required">{strings.DESCRIPTION}</span>
                 <Editor
@@ -722,6 +815,62 @@ const UpdateProperty = () => {
                 {formError && <Error message={commonStrings.FORM_ERROR} />}
               </div>
             </form>
+
+            {isBuilding && (
+              <div style={{ marginTop: 32, padding: '0 16px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <Typography variant="h6">{strings.ROOM_TYPES}</Typography>
+                  <Button
+                    variant="contained"
+                    className="btn-primary"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={() => navigate(`/create-property?parent=${property?._id}`)}
+                  >
+                    {strings.ADD_ROOM_TYPE}
+                  </Button>
+                </div>
+
+                {roomTypes.length === 0 ? (
+                  <Typography color="textSecondary">{strings.NO_ROOM_TYPES}</Typography>
+                ) : (
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{strings.NAME}</TableCell>
+                          <TableCell align="right">{strings.BEDROOMS}</TableCell>
+                          <TableCell align="right">{strings.BATHROOMS}</TableCell>
+                          <TableCell align="right">{strings.COUNT_OF_ROOMS}</TableCell>
+                          <TableCell align="right">{strings.PRICE} (€)</TableCell>
+                          <TableCell align="center" />
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {roomTypes.map((rt) => (
+                          <TableRow key={rt._id}>
+                            <TableCell>{rt.name}</TableCell>
+                            <TableCell align="right">{rt.bedrooms}</TableCell>
+                            <TableCell align="right">{rt.bathrooms}</TableCell>
+                            <TableCell align="right">{rt.countOfRooms || 1}</TableCell>
+                            <TableCell align="right">{rt.price}</TableCell>
+                            <TableCell align="center">
+                              <Button
+                                size="small"
+                                startIcon={<EditIcon />}
+                                onClick={() => navigate(`/update-property?p=${rt._id}`)}
+                              >
+                                {commonStrings.UPDATE}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </div>
+            )}
           </Paper>
         </div>
       )}

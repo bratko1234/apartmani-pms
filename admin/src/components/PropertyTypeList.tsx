@@ -55,6 +55,9 @@ const PropertyTypeList = ({
         <MenuItem value={movininTypes.PropertyType.Commercial}>{strings.COMMERCIAL}</MenuItem>
         <MenuItem value={movininTypes.PropertyType.Industrial}>{strings.INDUSTRIAL}</MenuItem>
         <MenuItem value={movininTypes.PropertyType.Townhouse}>{strings.TOWN_HOUSE}</MenuItem>
+        <MenuItem value={movininTypes.PropertyType.Hotel}>{strings.HOTEL}</MenuItem>
+        <MenuItem value={movininTypes.PropertyType.Hostel}>{strings.HOSTEL}</MenuItem>
+        <MenuItem value={movininTypes.PropertyType.Resort}>{strings.RESORT}</MenuItem>
       </Select>
     </div>
   )

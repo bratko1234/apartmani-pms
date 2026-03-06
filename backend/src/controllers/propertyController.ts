@@ -51,9 +51,12 @@ export const create = async (req: Request, res: Response) => {
       cancellation,
       aircon,
       rentalTerm,
+      parentProperty,
+      countOfRooms,
+      isBuilding,
     } = body
 
-    const _property = {
+    const _property: Record<string, unknown> = {
       name,
       type,
       agency,
@@ -75,6 +78,12 @@ export const create = async (req: Request, res: Response) => {
       cancellation,
       aircon,
       rentalTerm,
+      isBuilding: isBuilding || false,
+      countOfRooms: countOfRooms || 1,
+    }
+
+    if (parentProperty) {
+      _property.parentProperty = new mongoose.Types.ObjectId(parentProperty)
     }
 
     const property = new Property(_property)
@@ -268,6 +277,9 @@ export const update = async (req: Request, res: Response) => {
         aircon,
         rentalTerm,
         blockOnPay,
+        parentProperty,
+        countOfRooms,
+        isBuilding,
       } = body
 
       property.name = name
@@ -293,6 +305,11 @@ export const update = async (req: Request, res: Response) => {
       property.aircon = aircon
       property.rentalTerm = rentalTerm as movininTypes.RentalTerm
       property.blockOnPay = blockOnPay
+      property.isBuilding = isBuilding || false
+      property.countOfRooms = countOfRooms || 1
+      property.parentProperty = parentProperty
+        ? new mongoose.Types.ObjectId(parentProperty)
+        : undefined
 
       const tempDir = path.resolve(env.CDN_TEMP_PROPERTIES)
       const propertiesDir = path.resolve(env.CDN_PROPERTIES)
@@ -619,6 +636,7 @@ export const getProperty = async (req: Request, res: Response) => {
           model: 'LocationValue',
         },
       })
+      .populate('parentProperty', '_id name image type')
       .lean()
 
     if (property) {
@@ -671,7 +689,7 @@ export const getProperties = async (req: Request, res: Response) => {
     const options = 'i'
     // const language = body.language || env.DEFAULT_LANGUAGE
 
-    const $matchAnd: mongoose.FilterQuery<movininTypes.Property>[] = [
+    const $matchAnd: Record<string, unknown>[] = [
       { agency: { $in: agencies } },
     ]
     if (types.length > 0) {
@@ -878,6 +896,7 @@ export const getFrontendProperties = async (req: Request, res: Response) => {
         { rentalTerm: { $in: rentalTerms } },
         { available: true },
         { hidden: false },
+        { isBuilding: { $ne: true } },
       ],
     }
 
@@ -1052,10 +1071,16 @@ export const getFeaturedProperties = async (req: Request, res: Response) => {
     const size = Number.parseInt(req.params.size, 10)
     const language = String(req.params.language || env.DEFAULT_LANGUAGE)
     const locationId = req.query.location ? String(req.query.location) : undefined
+    const agencyId = req.query.agency ? String(req.query.agency) : undefined
 
     const $match: mongoose.QueryFilter<movininTypes.Property> = {
       available: true,
       hidden: false,
+      isBuilding: { $ne: true },
+    }
+
+    if (agencyId) {
+      $match.agency = new mongoose.Types.ObjectId(agencyId)
     }
 
     if (locationId) {
@@ -1144,6 +1169,140 @@ export const getFeaturedProperties = async (req: Request, res: Response) => {
     res.json(data)
   } catch (err) {
     logger.error(`[property.getFeaturedProperties] ${i18n.t('ERROR')}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
+  }
+}
+
+/**
+ * Get room types (child properties) for a building.
+ *
+ * @export
+ * @async
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {unknown}
+ */
+export const getRoomTypes = async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  try {
+    const children = await Property.find({ parentProperty: id })
+      .populate<{ agency: env.UserInfo }>('agency')
+      .sort({ name: 1 })
+      .lean()
+
+    const result = children.map((child) => {
+      const { _id, fullName, avatar } = child.agency as env.UserInfo
+      return {
+        ...child,
+        agency: { _id, fullName, avatar },
+      }
+    })
+
+    res.json(result)
+  } catch (err) {
+    logger.error(`[property.getRoomTypes] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
+  }
+}
+
+/**
+ * Get all buildings (properties with isBuilding=true).
+ *
+ * @export
+ * @async
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {unknown}
+ */
+export const getBuildingsWithOccupancy = async (req: Request, res: Response) => {
+  try {
+    const agencyId = req.query.agency as string | undefined
+
+    const filter: Record<string, unknown> = { isBuilding: true }
+    if (agencyId) {
+      filter.agency = new mongoose.Types.ObjectId(agencyId)
+    }
+
+    const buildings = await Property.find(filter)
+      .populate('agency', '_id fullName avatar')
+      .populate('location')
+      .sort({ name: 1 })
+      .lean()
+
+    const now = new Date()
+    const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0)
+    const dayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+
+    const results: movininTypes.BuildingWithOccupancy[] = await Promise.all(
+      buildings.map(async (building) => {
+        const roomTypes = await Property.find({ parentProperty: building._id })
+          .sort({ name: 1 })
+          .lean()
+
+        const roomTypesWithOccupancy: movininTypes.RoomTypeWithOccupancy[] = await Promise.all(
+          roomTypes.map(async (rt) => {
+            const occupiedRooms = await Booking.countDocuments({
+              property: rt._id,
+              status: { $in: [movininTypes.BookingStatus.Deposit, movininTypes.BookingStatus.Paid, movininTypes.BookingStatus.Reserved] },
+              from: { $lte: dayEnd },
+              to: { $gte: dayStart },
+            })
+            const countOfRooms = rt.countOfRooms || 0
+            return {
+              _id: rt._id.toString(),
+              name: rt.name,
+              type: rt.type as movininTypes.PropertyType,
+              price: rt.price,
+              countOfRooms,
+              occupiedRooms,
+              freeRooms: Math.max(0, countOfRooms - occupiedRooms),
+              available: rt.available !== false,
+            }
+          })
+        )
+
+        const totalRooms = roomTypesWithOccupancy.reduce((sum, rt) => sum + rt.countOfRooms, 0)
+        const occupiedRooms = roomTypesWithOccupancy.reduce((sum, rt) => sum + rt.occupiedRooms, 0)
+
+        return {
+          _id: building._id.toString(),
+          name: building.name,
+          image: building.image,
+          agency: building.agency as unknown as movininTypes.BuildingWithOccupancy['agency'],
+          location: building.location as unknown as movininTypes.Location,
+          totalRooms,
+          occupiedRooms,
+          freeRooms: totalRooms - occupiedRooms,
+          roomTypes: roomTypesWithOccupancy,
+        }
+      })
+    )
+
+    res.json(results)
+  } catch (err) {
+    logger.error(`[property.getBuildingsWithOccupancy] ${i18n.t('ERROR')}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
+  }
+}
+
+export const getBuildings = async (req: Request, res: Response) => {
+  try {
+    const agencyId = req.query.agency as string | undefined
+
+    const filter: Record<string, unknown> = { isBuilding: true }
+    if (agencyId) {
+      filter.agency = new mongoose.Types.ObjectId(agencyId)
+    }
+
+    const buildings = await Property.find(filter)
+      .select('_id name')
+      .sort({ name: 1 })
+      .lean()
+
+    res.json(buildings)
+  } catch (err) {
+    logger.error(`[property.getBuildings] ${i18n.t('ERROR')}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }

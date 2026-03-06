@@ -1,0 +1,66 @@
+.room-type-selector {
+  margin: 24px 0;
+}
+
+.room-type-selector-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.room-type-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #DDDDDD;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.room-type-item:hover {
+  border-color: #222222;
+}
+
+.room-type-item.selected {
+  border-color: var(--primary-color, #222222);
+  border-width: 2px;
+}
+
+.room-type-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.room-type-name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.room-type-details {
+  font-size: 0.875rem;
+  color: #6A6A6A;
+}
+
+.room-type-availability {
+  font-size: 0.8rem;
+  color: #6A6A6A;
+}
+
+.room-type-price {
+  text-align: right;
+}
+
+.room-type-price-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: block;
+}
+
+.room-type-price-unit {
+  font-size: 0.8rem;
+  color: #6A6A6A;
+}

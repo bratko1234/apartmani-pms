@@ -183,7 +183,9 @@ const MultipleSelect = ({
                       <>
                         <InputAdornment position="start">
                           <div className="agency-ia">
-                            <img src={movininHelper.joinURL(env.CDN_USERS, option.image)} alt={option.name} />
+                            {option.image
+                              ? <img src={movininHelper.joinURL(env.CDN_USERS, option.image)} alt={option.name} />
+                              : <AccountCircle className="avatar-small" color="disabled" />}
                           </div>
                         </InputAdornment>
                         {params.InputProps.startAdornment}
@@ -234,13 +236,17 @@ const MultipleSelect = ({
                     startAdornment: (
                       <>
                         <InputAdornment position="start">
-                          <img
-                            src={movininHelper.joinURL(env.CDN_PROPERTIES, option.image)}
-                            alt={option.name}
-                            style={{
-                              height: env.SELECTED_PROPERTY_OPTION_IMAGE_HEIGHT,
-                            }}
-                          />
+                          {option.image ? (
+                            <img
+                              src={movininHelper.joinURL(env.CDN_PROPERTIES, option.image)}
+                              alt={option.name}
+                              style={{
+                                height: env.SELECTED_PROPERTY_OPTION_IMAGE_HEIGHT,
+                              }}
+                            />
+                          ) : (
+                            <AccountCircle className="avatar-small" color="disabled" />
+                          )}
                         </InputAdornment>
                         {params.InputProps.startAdornment}
                       </>
@@ -288,7 +294,9 @@ const MultipleSelect = ({
             return (
               <li {...props} key={option._id} className={`${props.className} ms-option`}>
                 <span className="option-image agency-ia">
-                  <img src={movininHelper.joinURL(env.CDN_USERS, option.image)} alt={option.name} />
+                  {option.image
+                    ? <img src={movininHelper.joinURL(env.CDN_USERS, option.image)} alt={option.name} />
+                    : <AccountCircle className="avatar-medium" color="disabled" />}
                 </span>
                 <span className="option-name">{option.name}</span>
               </li>
@@ -306,13 +314,17 @@ const MultipleSelect = ({
             return (
               <li {...props} key={option._id} className={`${props.className} ms-option`}>
                 <span className="option-image property-ia">
-                  <img
-                    src={movininHelper.joinURL(env.CDN_PROPERTIES, option.image)}
-                    alt={option.name}
-                    style={{
-                      height: env.PROPERTY_OPTION_IMAGE_HEIGHT,
-                    }}
-                  />
+                  {option.image ? (
+                    <img
+                      src={movininHelper.joinURL(env.CDN_PROPERTIES, option.image)}
+                      alt={option.name}
+                      style={{
+                        height: env.PROPERTY_OPTION_IMAGE_HEIGHT,
+                      }}
+                    />
+                  ) : (
+                    <AccountCircle className="avatar-medium" color="disabled" />
+                  )}
                 </span>
                 <span className="property-option-name">{option.name}</span>
               </li>

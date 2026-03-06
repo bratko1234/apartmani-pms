@@ -161,3 +161,39 @@ export const getBookingProperties = (keyword: string, data: movininTypes.GetBook
       { withCredentials: true }
     )
     .then((res) => res.data)
+
+/**
+ * Get room types (children) of a building property.
+ *
+ * @param {string} buildingId
+ * @returns {Promise<movininTypes.Property[]>}
+ */
+export const getRoomTypes = (buildingId: string): Promise<movininTypes.Property[]> =>
+  axiosInstance
+    .get(
+      `/api/property-room-types/${encodeURIComponent(buildingId)}`,
+      { withCredentials: true }
+    )
+    .then((res) => res.data)
+
+/**
+ * Get all buildings (properties with isBuilding=true).
+ *
+ * @param {string} [agencyId]
+ * @returns {Promise<{ _id: string; name: string }[]>}
+ */
+export const getBuildingsWithOccupancy = (agencyId?: string): Promise<movininTypes.BuildingWithOccupancy[]> =>
+  axiosInstance
+    .get(
+      `/api/buildings-with-occupancy${agencyId ? `?agency=${encodeURIComponent(agencyId)}` : ''}`,
+      { withCredentials: true }
+    )
+    .then((res) => res.data)
+
+export const getBuildings = (agencyId?: string): Promise<{ _id: string; name: string }[]> =>
+  axiosInstance
+    .get(
+      `/api/buildings${agencyId ? `?agency=${encodeURIComponent(agencyId)}` : ''}`,
+      { withCredentials: true }
+    )
+    .then((res) => res.data)

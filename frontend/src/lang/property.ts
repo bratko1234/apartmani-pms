@@ -26,7 +26,9 @@ const strings = new LocalizedStrings({
     HIDDEN: 'Cachée',
     IMAGES: 'Images',
     DESCRIPTION_REQUIRED: 'Le champ description est requis',
-    RENTAL_TERM: 'Durée de location'
+    RENTAL_TERM: 'Durée de location',
+    SELECT_ROOM: 'Sélectionnez une chambre',
+    ROOMS_AVAILABLE: 'chambres disponibles',
   },
   en: {
     NAME: 'Name',
@@ -52,6 +54,8 @@ const strings = new LocalizedStrings({
     IMAGES: 'Images',
     DESCRIPTION_REQUIRED: 'Description is required',
     RENTAL_TERM: 'Rental term',
+    SELECT_ROOM: 'Select a room',
+    ROOMS_AVAILABLE: 'rooms available',
   },
   sr: {
     NAME: 'Ime',
@@ -77,6 +81,8 @@ const strings = new LocalizedStrings({
     IMAGES: 'Slike',
     DESCRIPTION_REQUIRED: 'Polje opis je obavezno',
     RENTAL_TERM: 'Period iznajmljivanja',
+    SELECT_ROOM: 'Izaberite sobu',
+    ROOMS_AVAILABLE: 'soba dostupno',
   },
 })
 

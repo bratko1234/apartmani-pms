@@ -120,7 +120,7 @@ const ImageEditor = ({
           className="main-image"
           alt=""
           src={
-            image
+            image && image.filename
               ? image.temp
                 ? movininHelper.joinURL(env.CDN_TEMP_PROPERTIES, image.filename)
                 : movininHelper.joinURL(env.CDN_PROPERTIES, image.filename)

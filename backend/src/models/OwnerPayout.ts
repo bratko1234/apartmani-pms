@@ -155,6 +155,7 @@ const ownerPayoutSchema = new Schema(
 
 ownerPayoutSchema.index({ ownerId: 1, 'period.year': 1, 'period.month': 1 }, { unique: true })
 
-const OwnerPayout = model('OwnerPayout', ownerPayoutSchema)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const OwnerPayout: any = model('OwnerPayout', ownerPayoutSchema)
 
 export default OwnerPayout

@@ -27,6 +27,7 @@ import * as PropertyService from '@/services/PropertyService'
 import * as UserService from '@/services/UserService'
 import * as PaymentService from '@/services/PaymentService'
 import * as DiscountService from '@/services/DiscountService'
+import RoomTypeSelector from '@/components/RoomTypeSelector'
 import NoMatch from './NoMatch'
 import SEO from '@/components/SEO'
 import ImageViewer from '@/components/ImageViewer'
@@ -65,6 +66,8 @@ const Property = () => {
   const [user, setUser] = useState<movininTypes.User>()
   const [discountPercent, setDiscountPercent] = useState(0)
   const [memberNightlyPrice, setMemberNightlyPrice] = useState(0)
+  const [roomTypes, setRoomTypes] = useState<movininTypes.Property[]>([])
+  const [selectedRoom, setSelectedRoom] = useState<movininTypes.Property | null>(null)
 
   useEffect(() => {
     const src = (_image: string) => movininHelper.joinURL(env.CDN_PROPERTIES, _image)
@@ -119,6 +122,16 @@ const Property = () => {
 
       if (_property) {
         setProperty(_property)
+
+        if (_property.isBuilding) {
+          try {
+            const rooms = await PropertyService.getRoomTypes(_property._id)
+            setRoomTypes(rooms)
+          } catch {
+            // Room types loading is non-fatal
+          }
+        }
+
         if (_property.price) {
           const _nightlyPrice = await PaymentService.convertPrice(_property.price)
           setNightlyPrice(_nightlyPrice)
@@ -315,6 +328,16 @@ const Property = () => {
                       </div>
                     )}
 
+                    {/* Room type selector for buildings */}
+                    {property.isBuilding && roomTypes.length > 0 && (
+                      <RoomTypeSelector
+                        roomTypes={roomTypes}
+                        selectedId={selectedRoom?._id}
+                        onSelect={setSelectedRoom}
+                        language={language}
+                      />
+                    )}
+
                     {/* Amenities grid */}
                     {amenities.length > 0 && (
                       <div className="property-amenities">
@@ -377,9 +400,13 @@ const Property = () => {
                         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                           e.preventDefault()
 
+                          const bookingPropertyId = property.isBuilding && selectedRoom
+                            ? selectedRoom._id
+                            : property._id
+
                           navigate('/checkout', {
                             state: {
-                              propertyId: property._id,
+                              propertyId: bookingPropertyId,
                               locationId: property.location._id,
                               from,
                               to
@@ -442,6 +469,7 @@ const Property = () => {
                           variant="contained"
                           fullWidth
                           className="booking-form-btn"
+                          disabled={property.isBuilding && !selectedRoom}
                         >
                           {strings.BOOK}
                         </Button>

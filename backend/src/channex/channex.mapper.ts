@@ -24,21 +24,21 @@ const buildPhotos = (property: env.Property): Record<string, unknown>[] => {
  * Map internal property to Channex property format.
  * See: https://docs.channex.io/api-v.1-documentation/hotels-collection
  */
-export const propertyToChannex = (property: env.Property, locationName?: string): Record<string, unknown> => {
+export const propertyToChannex = (property: env.Property, locationName?: string, isBuilding?: boolean): Record<string, unknown> => {
   const payload: Record<string, unknown> = {
     title: property.name,
     currency: 'EUR',
-    email: 'info@apartmani.ba',
-    phone: '+38759123456',
-    country: 'BA',
-    state: 'Republika Srpska',
+    email: env.CHANNEX_PROPERTY_EMAIL,
+    phone: env.CHANNEX_PROPERTY_PHONE,
+    country: env.CHANNEX_PROPERTY_COUNTRY,
+    state: env.CHANNEX_PROPERTY_STATE,
     city: locationName || 'Trebinje',
     address: property.address || '',
-    zip_code: '89101',
+    zip_code: env.CHANNEX_PROPERTY_ZIP,
     timezone: 'Europe/Sarajevo',
     latitude: property.latitude != null ? String(property.latitude) : undefined,
     longitude: property.longitude != null ? String(property.longitude) : undefined,
-    property_type: mapPropertyType(property.type),
+    property_type: isBuilding ? 'hotel' : mapPropertyType(property.type),
     facilities: [],
     content: {
       description: property.description || '',
@@ -60,7 +60,7 @@ export const propertyToChannex = (property: env.Property, locationName?: string)
 
 /**
  * Map PMS property to Channex room type format.
- * 1 property = 1 room type (1 apartment = 1 room).
+ * Uses countOfRooms for buildings with multiple identical units.
  */
 export const propertyToRoomType = (
   property: env.Property,
@@ -71,7 +71,7 @@ export const propertyToRoomType = (
   return {
     property_id: channexPropertyId,
     title: property.name,
-    count_of_rooms: 1,
+    count_of_rooms: property.countOfRooms || 1,
     occ_adults: defaultOccupancy,
     occ_children: property.bedrooms || 1,
     occ_infants: 1,
@@ -199,6 +199,9 @@ const mapPropertyType = (type: movininTypes.PropertyType): string => {
     [movininTypes.PropertyType.Farm]: 'farm_stay',
     [movininTypes.PropertyType.Industrial]: 'apart_hotel',
     [movininTypes.PropertyType.Plot]: 'holiday_home',
+    [movininTypes.PropertyType.Hotel]: 'hotel',
+    [movininTypes.PropertyType.Hostel]: 'hostel',
+    [movininTypes.PropertyType.Resort]: 'resort',
   }
   return typeMap[type] || 'apartment'
 }

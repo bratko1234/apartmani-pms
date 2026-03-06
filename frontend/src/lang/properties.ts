@@ -39,6 +39,9 @@ const strings = new LocalizedStrings({
     SHOW_MORE: 'Afficher plus',
     SHOW_LESS: 'Afficher moins',
     ENTIRE_PLACE: 'Logement entier',
+    HOTEL: 'Hôtel',
+    HOSTEL: 'Auberge',
+    RESORT: 'Resort',
   },
   en: {
     CANCELLATION: 'Cancellation',
@@ -77,6 +80,9 @@ const strings = new LocalizedStrings({
     SHOW_MORE: 'Show more',
     SHOW_LESS: 'Show less',
     ENTIRE_PLACE: 'Entire place',
+    HOTEL: 'Hotel',
+    HOSTEL: 'Hostel',
+    RESORT: 'Resort',
   },
   sr: {
     CANCELLATION: 'Otkazivanje',
@@ -115,6 +121,9 @@ const strings = new LocalizedStrings({
     SHOW_MORE: 'Prikaži više',
     SHOW_LESS: 'Prikaži manje',
     ENTIRE_PLACE: 'Cijeli prostor',
+    HOTEL: 'Hotel',
+    HOSTEL: 'Hostel',
+    RESORT: 'Odmaralište',
   },
 })
 

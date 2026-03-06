@@ -9,6 +9,7 @@ export const OTA_COMMISSION_RATES: Record<movininTypes.BookingSource, number> = 
   [movininTypes.BookingSource.BookingCom]: 0.15,
   [movininTypes.BookingSource.Expedia]: 0.15,
   [movininTypes.BookingSource.Direct]: 0,
+  [movininTypes.BookingSource.Widget]: 0,
   [movininTypes.BookingSource.Other]: 0,
 }
 

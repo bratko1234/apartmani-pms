@@ -38,5 +38,9 @@
     "eslint": "^9.27.0",
     "husky": "^9.1.7",
     "p-limit": "^6.2.0"
+  },
+  "dependencies": {
+    "ai": "^6.0.116",
+    "vargai": "^0.4.0-alpha63"
   }
 }

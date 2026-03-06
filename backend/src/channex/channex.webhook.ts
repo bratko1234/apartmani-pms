@@ -230,6 +230,18 @@ const handleNewMessage = async (payload: Record<string, unknown>): Promise<void>
   const channexMessageId = (data.id || '') as string
   const senderName = (attributes.sender_name || attributes.guest_name || 'Guest') as string
 
+  if (channexMessageId) {
+    const existing = await ChannexWebhookLog.findOne({
+      eventType: 'message_new',
+      'payload.data.id': channexMessageId,
+      processed: true,
+    })
+    if (existing) {
+      logger.info(`[channex.webhook] Message ${channexMessageId} already processed, skipping`)
+      return
+    }
+  }
+
   if (!channexBookingId) {
     logger.error('[channex.webhook] No booking ID in message payload')
     return

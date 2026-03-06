@@ -18,5 +18,8 @@ routes.route(routeNames.getProperties).post(authJwt.verifyToken, authJwt.authAge
 routes.route(routeNames.getBookingProperties).post(authJwt.verifyToken, authJwt.authAgency, propertyController.getBookingProperties)
 routes.route(routeNames.getFrontendProperties).post(propertyController.getFrontendProperties)
 routes.route(routeNames.getFeaturedProperties).get(propertyController.getFeaturedProperties)
+routes.route(routeNames.getRoomTypes).get(propertyController.getRoomTypes)
+routes.route(routeNames.getBuildingsWithOccupancy).get(authJwt.verifyToken, authJwt.authAgency, propertyController.getBuildingsWithOccupancy)
+routes.route(routeNames.getBuildings).get(authJwt.verifyToken, authJwt.authAgency, propertyController.getBuildings)
 
 export default routes

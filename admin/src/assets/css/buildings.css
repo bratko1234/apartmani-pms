@@ -1,0 +1,71 @@
+.buildings-list {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.buildings-list h1 {
+  margin-bottom: 20px;
+}
+
+.building-card {
+  margin-bottom: 16px;
+}
+
+.building-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.building-header img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.building-header .building-initial {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  font-size: 32px;
+  font-weight: bold;
+  color: #757575;
+}
+
+.building-header .building-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.building-header .building-info h2 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.building-header .building-info .building-meta {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.building-stats {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+.room-types-table {
+  margin-top: 8px;
+}
+
+.room-types-table th,
+.room-types-table td {
+  padding: 8px 16px;
+}

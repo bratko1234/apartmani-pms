@@ -18,6 +18,9 @@ const propertySchema = new Schema<env.Property>(
         movininTypes.PropertyType.Farm,
         movininTypes.PropertyType.Commercial,
         movininTypes.PropertyType.Industrial,
+        movininTypes.PropertyType.Hotel,
+        movininTypes.PropertyType.Hostel,
+        movininTypes.PropertyType.Resort,
       ],
       required: [true, "can't be blank"],
     },
@@ -133,7 +136,25 @@ const propertySchema = new Schema<env.Property>(
     blockOnPay: {
       type: Boolean,
       default: true,
-    }
+    },
+    parentProperty: {
+      type: Schema.Types.ObjectId,
+      ref: 'Property',
+      index: true,
+      default: null,
+    },
+    countOfRooms: {
+      type: Number,
+      default: 1,
+      validate: {
+        validator: Number.isInteger,
+        message: '{VALUE} is not an integer value',
+      },
+    },
+    isBuilding: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -146,6 +167,7 @@ propertySchema.index({ updatedAt: -1, _id: 1 })
 propertySchema.index({ agency: 1, type: 1, rentalTerm: 1, available: 1, updatedAt: -1, _id: 1 })
 propertySchema.index({ type: 1, rentalTerm: 1, available: 1 })
 propertySchema.index({ location: 1, available: 1 })
+propertySchema.index({ parentProperty: 1, isBuilding: 1 })
 propertySchema.index(
   { name: 'text' },
   {

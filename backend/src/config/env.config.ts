@@ -521,6 +521,63 @@ export const CHANNEX_ENABLED = helper.StringToBoolean(__env__('MI_CHANNEX_ENABLE
 export const PUBLIC_BACKEND_URL = __env__('MI_PUBLIC_BACKEND_URL', false)
 
 /**
+ * Default contact email for Channex property sync.
+ */
+export const CHANNEX_PROPERTY_EMAIL = __env__('MI_CHANNEX_PROPERTY_EMAIL', false, 'info@apartmani.ba')
+
+/**
+ * Default contact phone for Channex property sync.
+ */
+export const CHANNEX_PROPERTY_PHONE = __env__('MI_CHANNEX_PROPERTY_PHONE', false, '+38759123456')
+
+/**
+ * Default zip code for Channex property sync.
+ */
+export const CHANNEX_PROPERTY_ZIP = __env__('MI_CHANNEX_PROPERTY_ZIP', false, '89101')
+
+/**
+ * Default state for Channex property sync.
+ */
+export const CHANNEX_PROPERTY_STATE = __env__('MI_CHANNEX_PROPERTY_STATE', false, 'Republika Srpska')
+
+/**
+ * Default country code for Channex property sync.
+ */
+export const CHANNEX_PROPERTY_COUNTRY = __env__('MI_CHANNEX_PROPERTY_COUNTRY', false, 'BA')
+
+/**
+ * Widget allowed hosts for CORS and CSP frame-ancestors.
+ * Comma-separated list of origins.
+ *
+ * @type {string[]}
+ */
+export const WIDGET_HOSTS = __env__('MI_WIDGET_HOSTS', false)
+  .split(',')
+  .map((h) => h.trim())
+  .filter(Boolean)
+
+/**
+ * Monri.ba merchant key.
+ *
+ * @type {string}
+ */
+export const MONRI_MERCHANT_KEY = __env__('MI_MONRI_MERCHANT_KEY', false)
+
+/**
+ * Monri.ba authenticity token.
+ *
+ * @type {string}
+ */
+export const MONRI_AUTHENTICITY_TOKEN = __env__('MI_MONRI_AUTHENTICITY_TOKEN', false)
+
+/**
+ * Monri.ba API URL.
+ *
+ * @type {string}
+ */
+export const MONRI_API_URL = __env__('MI_MONRI_API_URL', false, 'https://ipg.monri.com')
+
+/**
  * User Document.
  *
  * @export
@@ -774,6 +831,9 @@ export interface Property extends Document {
   available?: boolean
   rentalTerm: movininTypes.RentalTerm
   blockOnPay?: boolean
+  parentProperty?: Types.ObjectId
+  countOfRooms?: number
+  isBuilding?: boolean
 }
 
 /**

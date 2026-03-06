@@ -4,6 +4,13 @@ import RateSeason from '../models/RateSeason'
 import RateDiscount from '../models/RateDiscount'
 import Property from '../models/Property'
 import * as logger from '../utils/logger'
+import * as channexSync from '../channex/channex.sync'
+
+const syncRatesAfterChange = (propertyId: string): void => {
+  channexSync.syncPropertyRates(propertyId).catch((err) => {
+    logger.error(`[rateService] Channex rate sync failed for ${propertyId}`, err)
+  })
+}
 
 /**
  * Get the effective nightly rate for a property on a given date.
@@ -278,6 +285,7 @@ export const createSeason = async (
 
   const saved = await season.save()
   logger.info(`[rateService] Season created: ${saved._id}`)
+  syncRatesAfterChange(payload.property)
   return saved.toObject() as unknown as movininTypes.RateSeason
 }
 
@@ -320,6 +328,7 @@ export const updateSeason = async (
 
   if (updated) {
     logger.info(`[rateService] Season updated: ${id}`)
+    syncRatesAfterChange(payload.property)
   }
 
   return updated as unknown as movininTypes.RateSeason | null
@@ -329,6 +338,7 @@ export const deleteSeason = async (id: string): Promise<boolean> => {
   const result = await RateSeason.findByIdAndDelete(id)
   if (result) {
     logger.info(`[rateService] Season deleted: ${id}`)
+    syncRatesAfterChange(result.property.toString())
     return true
   }
   return false
@@ -367,6 +377,7 @@ export const createDiscount = async (
 
   const saved = await discount.save()
   logger.info(`[rateService] Discount created: ${saved._id}`)
+  syncRatesAfterChange(payload.property)
   return saved.toObject() as unknown as movininTypes.RateDiscount
 }
 
@@ -393,6 +404,7 @@ export const updateDiscount = async (
 
   if (updated) {
     logger.info(`[rateService] Discount updated: ${id}`)
+    syncRatesAfterChange(updated.property.toString())
   }
 
   return updated as unknown as movininTypes.RateDiscount | null
@@ -402,6 +414,7 @@ export const deleteDiscount = async (id: string): Promise<boolean> => {
   const result = await RateDiscount.findByIdAndDelete(id)
   if (result) {
     logger.info(`[rateService] Discount deleted: ${id}`)
+    syncRatesAfterChange(result.property.toString())
     return true
   }
   return false

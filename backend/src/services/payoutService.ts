@@ -49,7 +49,7 @@ export const generateMonthlyPayout = async (
     ownerId: new mongoose.Types.ObjectId(ownerId),
     'period.year': year,
     'period.month': month,
-  }).lean()
+  }).lean() as any
 
   if (existingPayout && existingPayout.status !== movininTypes.PayoutStatus.Draft) {
     throw new Error(`Payout for ${year}-${month} is already ${existingPayout.status} and cannot be regenerated`)

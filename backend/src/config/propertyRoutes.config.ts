@@ -11,6 +11,9 @@ const routes = {
   getFrontendProperties: '/api/frontend-properties/:page/:size',
   getFeaturedProperties: '/api/featured-properties/:page/:size/:language',
   checkProperty: '/api/check-property/:id',
+  getRoomTypes: '/api/property-room-types/:id',
+  getBuildings: '/api/buildings',
+  getBuildingsWithOccupancy: '/api/buildings-with-occupancy',
 }
 
 export default routes
